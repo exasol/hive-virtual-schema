@@ -55,12 +55,11 @@ class HiveSqlDialectIT extends AbstractIntegrationTest {
     @Container
     public static DockerComposeContainer<? extends DockerComposeContainer<?>> hiveContainer = new DockerComposeContainer<>(
             new File(HIVE_DOCKER_COMPOSE_YAML)) //
-                    .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
-                            Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(50)));
+                    .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT, Wait.forListeningPort());
     @Container
     private static final ExasolContainer<? extends ExasolContainer<?>> exasolContainer = new ExasolContainer<>(
             EXASOL_DOCKER_IMAGE_REFERENCE) //
-                    .withLogConsumer(new Slf4jLogConsumer(LOGGER)); //
+                    .withLogConsumer(new Slf4jLogConsumer(LOGGER)).withReuse(true); //
     private static Statement statementExasol;
 
     @BeforeAll
