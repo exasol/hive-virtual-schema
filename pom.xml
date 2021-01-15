@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.exasol</groupId>
     <artifactId>hive-virtual-schema</artifactId>
@@ -46,18 +48,7 @@
             <artifactId>virtual-schema-common-jdbc</artifactId>
             <version>${vscjdbc.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.exasol</groupId>
-            <artifactId>db-fundamentals-java</artifactId>
-            <version>0.1.1</version>
-        </dependency>
         <!--Unit test dependencies-->
-        <dependency>
-            <groupId>nl.jqno.equalsverifier</groupId>
-            <artifactId>equalsverifier</artifactId>
-            <version>3.5</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>virtual-schema-common-jdbc</artifactId>
@@ -250,7 +241,6 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
@@ -258,7 +248,6 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-                    
                 </executions>
             </plugin>
             <plugin>
@@ -299,6 +288,9 @@
                     <!-- Set the highest log level for coverage testing, so that we have a chance to reach branches
                       <property>	                      in the logging lambdas too. -->
                     <argLine>-Djava.util.logging.config.file=src/test/resources/logging.properties ${argLine}</argLine>
+                    <excludes>
+                        <exclude>HiveSqlDialectIT.java</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

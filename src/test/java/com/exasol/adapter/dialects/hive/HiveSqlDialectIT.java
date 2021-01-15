@@ -8,14 +8,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.sql.*;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
+import com.exasol.bucketfs.Bucket;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.exasol.adapter.dialects.AbstractIntegrationTest;
 import com.exasol.bucketfs.BucketAccessException;
 import com.exasol.containers.ExasolContainer;
-import com.exasol.containers.ExasolContainerConstants;
 import com.exasol.dbbuilder.dialects.exasol.*;
 
 /**
@@ -37,7 +36,7 @@ import com.exasol.dbbuilder.dialects.exasol.*;
  */
 @Tag("integration")
 @Testcontainers
-class HiveSqlDialectIT extends AbstractIntegrationTest {
+class HiveSqlDialectIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlDialectIT.class);
     private static final String HIVE_DOCKER_COMPOSE_YAML = "src/test/resources/integration/driver/hive/docker-compose.yaml";
     private static final String HIVE_SERVICE_NAME = "hive-server_1";
@@ -179,8 +178,7 @@ class HiveSqlDialectIT extends AbstractIntegrationTest {
         assertThat(actualResult, equalTo(expected));
     }
 
-    @Override
-    protected Connection getExasolConnection() throws SQLException {
+    private Connection getExasolConnection() throws SQLException {
         return exasolContainer.createConnection("");
     }
 
@@ -617,5 +615,71 @@ class HiveSqlDialectIT extends AbstractIntegrationTest {
         final String query = "SELECT * FROM " + VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL + "."
                 + TABLE_HIVE_DECIMAL_CAST;
         assertThat(statementExasol.executeQuery(query), matchesResultSet(expected));
+    }
+
+    private static void uploadDriverToBucket(final String driverName, final String resourcesDialectName,
+                                               final Bucket bucket) throws InterruptedException, BucketAccessException, TimeoutException {
+        final Path pathToSettingsFile = Path.of("src", "test", "resources", "integration", "driver",
+                resourcesDialectName, JDBC_DRIVER_CONFIGURATION_FILE_NAME);
+        bucket.uploadFile(PATH_TO_VIRTUAL_SCHEMAS_JAR, VIRTUAL_SCHEMAS_JAR_NAME_AND_VERSION);
+        bucket.uploadFile(pathToSettingsFile, "drivers/jdbc/" + JDBC_DRIVER_CONFIGURATION_FILE_NAME);
+        final String driverPath = getPropertyFromFile(resourcesDialectName, "driver.path");
+        bucket.uploadFile(Path.of(driverPath, driverName), "drivers/jdbc/" + driverName);
+    }
+
+    private static String getPathToPropertyFile(final String resourcesDialectName) {
+        return "src/test/resources/integration/driver/" + resourcesDialectName + "/" + resourcesDialectName
+                + ".properties";
+    }
+
+    private static void uploadVsJarToBucket(final Bucket bucket)
+            throws InterruptedException, BucketAccessException, TimeoutException {
+        bucket.uploadFile(PATH_TO_VIRTUAL_SCHEMAS_JAR, VIRTUAL_SCHEMAS_JAR_NAME_AND_VERSION);
+    }
+
+    private static String getPropertyFromFile(final String resourcesDialectName, final String propertyName) {
+        final String pathToPropertyFile = getPathToPropertyFile(resourcesDialectName);
+        try (final InputStream inputStream = new FileInputStream(pathToPropertyFile)) {
+            final Properties properties = new Properties();
+            properties.load(inputStream);
+            return properties.getProperty(propertyName);
+        } catch (final IOException e) {
+            throw new IllegalArgumentException(
+                    "Cannot access the properties file or read from it. Check if the path spelling is correct"
+                            + " and if the file exists.");
+        }
+    }
+
+    private static void createTestTablesForJoinTests(final Connection connection, final String schemaName)
+            throws SQLException {
+        try (final Statement statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE " + schemaName + "." + TABLE_JOIN_1 + "(x INT, y VARCHAR(100))");
+            statement.execute("INSERT INTO " + schemaName + "." + TABLE_JOIN_1 + " VALUES (1,'aaa')");
+            statement.execute("INSERT INTO " + schemaName + "." + TABLE_JOIN_1 + " VALUES (2,'bbb')");
+            statement.execute("CREATE TABLE " + schemaName + "." + TABLE_JOIN_2 + "(x INT, y VARCHAR(100))");
+            statement.execute("INSERT INTO " + schemaName + "." + TABLE_JOIN_2 + " VALUES (2,'bbb')");
+            statement.execute("INSERT INTO " + schemaName + "." + TABLE_JOIN_2 + " VALUES (3,'ccc')");
+        }
+    }
+
+    private ResultSet getExpectedResultSet(final List<String> expectedColumns, final List<String> expectedRows)
+            throws SQLException {
+        final Connection connection = getExasolConnection();
+        try (final Statement statement = connection.createStatement()) {
+            final String expectedValues = expectedRows.stream().map(row -> "(" + row + ")")
+                    .collect(Collectors.joining(","));
+            final String qualifiedExpectedTableName = SCHEMA_EXASOL + ".EXPECTED";
+            statement.execute("CREATE OR REPLACE TABLE " + qualifiedExpectedTableName + "("
+                    + String.join(", ", expectedColumns) + ")");
+            statement.execute("INSERT INTO " + qualifiedExpectedTableName + " VALUES" + expectedValues);
+            return statement.executeQuery("SELECT * FROM " + qualifiedExpectedTableName);
+        }
+    }
+
+    private ResultSet getActualResultSet(final String query) throws SQLException {
+        final Connection connection = getExasolConnection();
+        try (final Statement statement = connection.createStatement()) {
+            return statement.executeQuery(query);
+        }
     }
 }
