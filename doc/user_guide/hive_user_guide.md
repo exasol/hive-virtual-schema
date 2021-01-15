@@ -34,7 +34,7 @@ This step is necessary since the UDF container the adapter runs in has no access
 
 ## Installing the Adapter Script
 
-Upload the latest available release of [Virtual Schema JDBC Adapter](https://github.com/exasol/virtual-schemas/releases) to Bucket FS.
+Upload the latest available release of [Hive Virtual Schema](https://github.com/exasol/hive-virtual-schema/releases) to Bucket FS.
 
 Then create a schema to hold the adapter script.
 
