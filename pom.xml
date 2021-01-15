@@ -3,7 +3,7 @@
     <groupId>com.exasol</groupId>
     <artifactId>hive-virtual-schema</artifactId>
     <version>1.0.0</version>
-    <name>Virtual Schema Hive</name>
+    <name>Virtual Schema for Hive</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
