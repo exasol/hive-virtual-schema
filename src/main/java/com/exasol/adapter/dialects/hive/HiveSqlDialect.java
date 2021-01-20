@@ -18,6 +18,7 @@ import com.exasol.adapter.dialects.*;
 import com.exasol.adapter.jdbc.*;
 import com.exasol.adapter.sql.ScalarFunction;
 import com.exasol.adapter.sql.SqlNodeVisitor;
+import com.exasol.errorreporting.ExaError;
 
 /**
  * Dialect for Hive, using the Cloudera Hive JDBC Driver/Connector (developed by Simba). Only supports Hive 2.1.0 and
@@ -136,8 +137,9 @@ public class HiveSqlDialect extends AbstractSqlDialect {
         try {
             return new HiveMetadataReader(this.connectionFactory.getConnection(), this.properties);
         } catch (final SQLException exception) {
-            throw new RemoteMetadataReaderException(
-                    "Unable to create Hive remote metadata reader. Caused by: " + exception.getMessage(), exception);
+            throw new RemoteMetadataReaderException(ExaError.messageBuilder("E-VS-HIVE-1").message(
+                    "Unable to create Hive remote metadata reader. Caused by: {{cause}}") //
+                    .unquotedParameter("cause", exception.getMessage()).toString(), exception);
         }
     }
 

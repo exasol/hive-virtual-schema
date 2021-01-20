@@ -8,6 +8,7 @@ import com.exasol.adapter.dialects.*;
 import com.exasol.adapter.metadata.ColumnMetadata;
 import com.exasol.adapter.metadata.TableMetadata;
 import com.exasol.adapter.sql.*;
+import com.exasol.errorreporting.ExaError;
 
 /**
  * This class generates SQL queries for the {@link HiveSqlDialect}.
@@ -120,32 +121,32 @@ public class HiveSqlGenerationVisitor extends SqlGenerationVisitor {
     @Override
     public String visit(final SqlFunctionScalar function) throws AdapterException {
         switch (function.getFunction()) {
-        case CONCAT:
-            return getCastedFunction("CONCAT", function);
-        case REPEAT:
-            return getCastedFunction("REPEAT", function);
-        case UPPER:
-            return getCastedFunction("UPPER", function);
-        case LOWER:
-            return getCastedFunction("LOWER", function);
-        case DIV:
-            return getChangedFunction(function, "DIV");
-        case MOD:
-            return getChangedFunction(function, "%");
-        case SUBSTR:
-            return getChangedSubstringFunction(function);
-        case CURRENT_DATE:
-            return "CURRENT_DATE";
-        case DATE_TRUNC:
-            return changeDateTrunc(function);
-        case BIT_AND:
-            return getChangedFunction(function, "&");
-        case BIT_OR:
-            return getChangedFunction(function, "|");
-        case BIT_XOR:
-            return getChangedFunction(function, "^");
-        default:
-            return super.visit(function);
+            case CONCAT:
+                return getCastedFunction("CONCAT", function);
+            case REPEAT:
+                return getCastedFunction("REPEAT", function);
+            case UPPER:
+                return getCastedFunction("UPPER", function);
+            case LOWER:
+                return getCastedFunction("LOWER", function);
+            case DIV:
+                return getChangedFunction(function, "DIV");
+            case MOD:
+                return getChangedFunction(function, "%");
+            case SUBSTR:
+                return getChangedSubstringFunction(function);
+            case CURRENT_DATE:
+                return "CURRENT_DATE";
+            case DATE_TRUNC:
+                return changeDateTrunc(function);
+            case BIT_AND:
+                return getChangedFunction(function, "&");
+            case BIT_OR:
+                return getChangedFunction(function, "|");
+            case BIT_XOR:
+                return getChangedFunction(function, "^");
+            default:
+                return super.visit(function);
         }
     }
 
@@ -228,8 +229,9 @@ public class HiveSqlGenerationVisitor extends SqlGenerationVisitor {
                 return getTypeNameFromColumn(column).equals(BINARY_TYPE_NAME);
             }
             return false;
-        } catch (final Exception exception) {
-            throw new SqlGenerationVisitorException("Exception during deserialization of ColumnAdapterNotes. ",
+        } catch (final AdapterException exception) {
+            throw new SqlGenerationVisitorException(ExaError.messageBuilder("E-VS-HIVE-2") //
+                    .message("Exception during deserialization of ColumnAdapterNotes.").toString(),
                     exception);
         }
     };
