@@ -44,28 +44,29 @@ Find all the documentation in the [Virtual Schemas project][vs-doc].
 
 ### Run Time Dependencies
 
-Running the Virtual Schema requires a Java Runtime version 9 or later.
+Running the Virtual Schema requires a Java Runtime version 11 or later.
 
-| Dependency                                                                             | Purpose                                                | License                          |
-|----------------------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------|
-| [Exasol Virtual Schema JDBC](https://github.com/exasol/virtual-schema-common-jdbc)     | Common JDBC functions for Virtual Schemas adapters     | MIT License                      |
-| [Hive JDBC driver](https://www.cloudera.com/downloads/connectors/hive/jdbc/2-6-10.html)| Connecting to the data source                          | Check driver documentation       |
+| Dependency                                          | Purpose                                                | License                    |
+|-----------------------------------------------------|--------------------------------------------------------|--------------------------- |
+| [Exasol Virtual Schema JDBC][vs-common-jdbc]        | Common JDBC functions for Virtual Schemas adapters     | MIT License                |
+| [Hive JDBC driver][hive-jdbc-driver]                | Connecting to the data source                          | Check driver documentation |
+| [Exasol Error Reporting Java][error-reporting-java] | Unified error messages.                                | MIT License                |
 
 ### Test Dependencies
 
-| Dependency                                                                          | Purpose                                                | License                          |
-|-------------------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------|
-| [Apache Maven](https://maven.apache.org/)                                           | Build tool                                             | Apache License 2.0               |
-| [Apache Trift][apache-trift]                                                        | Need for Hive integration test                         | Apache License 2.0               |
-| [Exasol JDBC Driver][exasol-jdbc-driver]                                            | JDBC driver for Exasol database                        | MIT License                      |
-| [Exasol Testcontainers][exasol-testcontainers]                                      | Exasol extension for the Testcontainers framework      | MIT License                      |
-| [HBase server][hbase-server]                                                        | The Hadoop database                                    | Apache License 2.0               |
-| [Hive JDBC Driver][hive-jdbc-driver]                                                | JDBC driver for Hive database                          | Apache License 2.0               |
-| [Java Hamcrest](http://hamcrest.org/JavaHamcrest/)                                  | Checking for conditions in code via matchers           | BSD License                      |
-| [JUnit](https://junit.org/junit5)                                                   | Unit testing framework                                 | Eclipse Public License 1.0       |
-| [Mockito](http://site.mockito.org/)                                                 | Mocking framework                                      | MIT License                      |
-| [Testcontainers](https://www.testcontainers.org/)                                   | Container-based integration tests                      | MIT License                      |
-| [Test Database Builder][test-bd-builder]                                            | Fluent database interfaces for testing                 | MIT License                      |
+| Dependency                                           | Purpose                                                | License                    |
+|------------------------------------------------------|--------------------------------------------------------|----------------------------|
+| [Apache Maven](https://maven.apache.org/)            | Build tool                                             | Apache License 2.0         |
+| [Apache Trift][apache-trift]                         | Need for Hive integration test                         | Apache License 2.0         |
+| [Exasol JDBC Driver][exasol-jdbc-driver]             | JDBC driver for Exasol database                        | MIT License                |
+| [Exasol Testcontainers][exasol-testcontainers]       | Exasol extension for the Testcontainers framework      | MIT License                |
+| [HBase server][hbase-server]                         | The Hadoop database                                    | Apache License 2.0         |
+| [Hive JDBC Driver][hive-jdbc-driver]                 | JDBC driver for Hive database                          | Apache License 2.0         |
+| [Java Hamcrest](http://hamcrest.org/JavaHamcrest/)   | Checking for conditions in code via matchers           | BSD License                |
+| [JUnit](https://junit.org/junit5)                    | Unit testing framework                                 | Eclipse Public License 1.0 |
+| [Mockito](http://site.mockito.org/)                  | Mocking framework                                      | MIT License                |
+| [Testcontainers](https://www.testcontainers.org/)    | Container-based integration tests                      | MIT License                |
+| [Test Database Builder][test-bd-builder]             | Fluent database interfaces for testing                 | MIT License                |
 
 ### Maven Plug-ins
 
@@ -82,6 +83,10 @@ Running the Virtual Schema requires a Java Runtime version 9 or later.
 | [Artifact Reference Checker Plugin][artifact-ref-checker-plugin]   | Check if artifact is referenced with correct version   | MIT License                   |
 | [Project Keeper Maven Plugin][project-keeper-maven-plugin]         | Checking project structure                             | MIT License                   |
 | [Sonatype OSS Index Maven Plugin][sonatype-oss-index-maven-plugin] | Checking dependencies vulnerability                    | ASL2                          |
+
+[vs-common-jdbc]: https://github.com/exasol/virtual-schema-common-jdbc
+[error-reporting-java]: https://github.com/exasol/error-reporting-java/
+[hive-jdbc-driver]: https://www.cloudera.com/downloads/connectors/hive/jdbc/2-6-10.html
 
 [apache-trift]: http://thrift.apache.org/
 [exasol-jdbc-driver]: https://www.exasol.com/portal/display/DOWNLOAD/Exasol+Download+Section

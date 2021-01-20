@@ -9,13 +9,12 @@ Code name: Migration from the virtual-schemas repository
 ## Runtime Dependencies
 
 * Added `com.exasol:virtual-schema-common-jdbc:8.0.0`
-* Added `com.exasol:error-reporting-java:0.2.0`
 
 ## Test Dependencies
 
 * Added `org.hamcrest:hamcrest:2.2`
 * Added `org.junit.jupiter:junit-jupiter:5.7.0`
-* Added `org.mockito:mockito-junit-jupiter:3.6.28`
+* Added `org.mockito:mockito-junit-jupiter:3.6.0`
 * Added `nl.jqno.equalsverifier:equalsverifier:3.5`
 * Added `com.exasol:exasol-testcontainers:3.3.1`
 * Added `org.testcontainers:junit-jupiter:1.15.0`
@@ -23,7 +22,7 @@ Code name: Migration from the virtual-schemas repository
 * Added `org.apache.httpcomponents:httpclient:4.5.13`
 * Added `org.apache.thrift:libthrift:0.13.0`
 * Added `org.apache.hbase:hbase-server:2.4.0`
-* Added `com.exasol:test-db-builder-java:2.0.0`
+* Added `com.exasol:test-db-builder-java:1.1.0`
 * Added `com.exasol:hamcrest-resultset-matcher:1.2.2`
 * Added `com.exasol:exasol-jdbc:7.0.4`
 
