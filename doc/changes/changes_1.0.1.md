@@ -1,10 +1,14 @@
 # Hive Virtual Schemas 1.0.1, released 2021-??-??
 
-Code name: Migration from the virtual-schemas repository
+Code name: Updated documentation
+
+## Documentation
+
+* #3: Added information about integration tests.
 
 ## Refactoring
 
-* # 9: Added error builder.
+* #9: Added error builder.
 
 ## Dependencies Updates
 
