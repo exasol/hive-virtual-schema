@@ -5,6 +5,7 @@ Code name: Updated documentation
 ## Documentation
 
 * #3: Added information about integration tests.
+* #11: Changed the Hive connection name in user guide.
 
 ## Refactoring
 

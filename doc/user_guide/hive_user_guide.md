@@ -72,7 +72,7 @@ CREATE VIRTUAL SCHEMA <virtual schema name>
     USING ADAPTER.JDBC_ADAPTER 
     WITH
     SQL_DIALECT     = 'HIVE'
-    CONNECTION_NAME = 'HIVE_CONN'
+    CONNECTION_NAME = 'HIVE_CONNECTION'
     SCHEMA_NAME     = '<schema name>';
 ```
 
