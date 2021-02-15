@@ -14,7 +14,7 @@ The `SQL_DIALECT` property used when executing a `CREATE VIRTUAL SCHEMA` from th
 ## Refactoring
 
 * #9: Added error builder.
-* #13: Updated dialect.
+* #13: Updated dialect to the latest `virtual-schema-common-jdbc`.
 
 ## Dependencies Updates
 
