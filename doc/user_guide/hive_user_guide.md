@@ -47,7 +47,7 @@ The SQL statement below creates the adapter script, defines the Java class that 
 ```sql
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-8.0.0-hive-1.0.1.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-9.0.1-hive-2.0.0.jar;
   %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
 /
 ```
@@ -71,7 +71,6 @@ Below you see how a Hive Virtual Schema is created. Please note that you have to
 CREATE VIRTUAL SCHEMA <virtual schema name> 
     USING ADAPTER.JDBC_ADAPTER 
     WITH
-    SQL_DIALECT     = 'HIVE'
     CONNECTION_NAME = 'HIVE_CONNECTION'
     SCHEMA_NAME     = '<schema name>';
 ```
@@ -152,7 +151,6 @@ You can now create a virtual schema using the Kerberos connection created before
 CREATE VIRTUAL SCHEMA <virtual schema name> 
    USING ADAPTER.JDBC_ADAPTER
    WITH
-   SQL_DIALECT     = 'HIVE'
    CONNECTION_NAME = 'KRB_CONN'
    SCHEMA_NAME     = '<schema name>';
 ```
@@ -302,7 +300,7 @@ In Virtual Schema adapter:
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %jvmoption -Dsun.security.krb5.disableReferrals=true;
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-8.0.0-hive-1.0.1.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-9.0.1-hive-2.0.0.jar;
   %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
 /
 ```

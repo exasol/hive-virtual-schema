@@ -104,7 +104,6 @@ class HiveSqlDialectTest {
     }
 
     private void setMandatoryProperties() {
-        this.rawProperties.put(AdapterProperties.SQL_DIALECT_PROPERTY, "HIVE");
         this.rawProperties.put(AdapterProperties.CONNECTION_NAME_PROPERTY, "MY_CONN");
     }
 }

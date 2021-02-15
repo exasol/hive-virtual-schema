@@ -7,13 +7,13 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.exasol.adapter.jdbc.JDBCTypeDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.dialects.BaseIdentifierConverter;
 import com.exasol.adapter.jdbc.ColumnMetadataReader;
-import com.exasol.adapter.jdbc.JdbcTypeDescription;
 import com.exasol.adapter.metadata.DataType;
 
 class HiveColumnMetadataReaderTest {
@@ -27,14 +27,14 @@ class HiveColumnMetadataReaderTest {
 
     @Test
     void mapDecimalReturnDecimal() {
-        final JdbcTypeDescription typeDescription = new JdbcTypeDescription(Types.DECIMAL, 0,
+        final JDBCTypeDescription typeDescription = new JDBCTypeDescription(Types.DECIMAL, 0,
                 DataType.MAX_EXASOL_DECIMAL_PRECISION, 10, "DECIMAL");
         assertThat(this.columnMetadataReader.mapJdbcType(typeDescription), equalTo(DataType.createDecimal(36, 0)));
     }
 
     @Test
     void mapDecimalReturnVarchar() {
-        final JdbcTypeDescription typeDescription = new JdbcTypeDescription(Types.DECIMAL, 0,
+        final JDBCTypeDescription typeDescription = new JDBCTypeDescription(Types.DECIMAL, 0,
                 DataType.MAX_EXASOL_DECIMAL_PRECISION + 1, 10, "DECIMAL");
         assertThat(this.columnMetadataReader.mapJdbcType(typeDescription),
                 equalTo(DataType.createMaximumSizeVarChar(DataType.ExaCharset.UTF8)));
@@ -42,7 +42,7 @@ class HiveColumnMetadataReaderTest {
 
     @Test
     void mapBinaryReturnVarchar() {
-        final JdbcTypeDescription typeDescription = new JdbcTypeDescription(Types.BINARY, 0, 0, 0, "BINARY");
+        final JDBCTypeDescription typeDescription = new JDBCTypeDescription(Types.BINARY, 0, 0, 0, "BINARY");
         assertThat(this.columnMetadataReader.mapJdbcType(typeDescription),
                 equalTo(DataType.createMaximumSizeVarChar(DataType.ExaCharset.UTF8)));
     }
@@ -54,7 +54,7 @@ class HiveColumnMetadataReaderTest {
         final AdapterProperties properties = new AdapterProperties(rawProperties);
         final ColumnMetadataReader columnMetadataReader = new HiveColumnMetadataReader(null, properties,
                 BaseIdentifierConverter.createDefault());
-        final JdbcTypeDescription typeDescription = new JdbcTypeDescription(Types.DECIMAL, 0,
+        final JDBCTypeDescription typeDescription = new JDBCTypeDescription(Types.DECIMAL, 0,
                 DataType.MAX_EXASOL_DECIMAL_PRECISION + 1, 10, "DECIMAL");
         assertThat(columnMetadataReader.mapJdbcType(typeDescription), equalTo(DataType.createDecimal(10, 2)));
     }

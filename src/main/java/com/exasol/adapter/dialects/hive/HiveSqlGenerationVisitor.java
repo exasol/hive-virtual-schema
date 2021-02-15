@@ -1,14 +1,13 @@
 package com.exasol.adapter.dialects.hive;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.exasol.adapter.AdapterException;
-import com.exasol.adapter.dialects.*;
-import com.exasol.adapter.metadata.ColumnMetadata;
-import com.exasol.adapter.metadata.TableMetadata;
+import com.exasol.adapter.dialects.SqlDialect;
+import com.exasol.adapter.dialects.rewriting.SqlGenerationContext;
+import com.exasol.adapter.dialects.rewriting.SqlGenerationVisitor;
 import com.exasol.adapter.sql.*;
-import com.exasol.errorreporting.ExaError;
 
 /**
  * This class generates SQL queries for the {@link HiveSqlDialect}.
@@ -28,45 +27,11 @@ public class HiveSqlGenerationVisitor extends SqlGenerationVisitor {
 
     @Override
     public String visit(final SqlSelectList selectList) throws AdapterException {
-        final List<String> selectListElements = new ArrayList<>();
-        if (selectList.isSelectStar()) {
-            selectListElements.addAll(getSelectStarList(selectList));
+        if (!selectList.hasExplicitColumnsList()) {
+            return SqlConstants.ONE;
         } else {
-            if (selectList.isRequestAnyColumn()) {
-                return SqlConstants.ONE;
-            } else {
-                selectListElements.addAll(getSelectList(selectList));
-            }
+            return String.join(", ", getSelectList(selectList));
         }
-        return String.join(", ", selectListElements);
-    }
-
-    private List<String> getSelectStarList(final SqlSelectList selectList) throws AdapterException {
-        if (SqlGenerationHelper.selectListRequiresCasts(selectList, this.nodeRequiresCast)) {
-            final List<TableMetadata> tableMetadata = new ArrayList<>();
-            final SqlStatementSelect select = (SqlStatementSelect) selectList.getParent();
-            SqlGenerationHelper.addMetadata(select.getFromClause(), tableMetadata);
-            return getSelectListWithColumns(tableMetadata);
-        } else {
-            return new ArrayList<>(Collections.singletonList("*"));
-        }
-    }
-
-    private List<String> getSelectListWithColumns(final List<TableMetadata> tableMetadata) throws AdapterException {
-        final List<String> selectListElements = new ArrayList<>(tableMetadata.size());
-        int columnId = 0;
-        for (final TableMetadata tableMeta : tableMetadata) {
-            for (final ColumnMetadata columnMeta : tableMeta.getColumns()) {
-                final SqlColumn column = new SqlColumn(columnId, columnMeta);
-                if (getTypeNameFromColumn(column).equals(BINARY_TYPE_NAME)) {
-                    selectListElements.add("base64(" + super.visit(column) + ")");
-                } else {
-                    selectListElements.add(super.visit(column));
-                }
-                ++columnId;
-            }
-        }
-        return selectListElements;
     }
 
     private List<String> getSelectList(final SqlSelectList selectList) throws AdapterException {
@@ -121,32 +86,32 @@ public class HiveSqlGenerationVisitor extends SqlGenerationVisitor {
     @Override
     public String visit(final SqlFunctionScalar function) throws AdapterException {
         switch (function.getFunction()) {
-            case CONCAT:
-                return getCastedFunction("CONCAT", function);
-            case REPEAT:
-                return getCastedFunction("REPEAT", function);
-            case UPPER:
-                return getCastedFunction("UPPER", function);
-            case LOWER:
-                return getCastedFunction("LOWER", function);
-            case DIV:
-                return getChangedFunction(function, "DIV");
-            case MOD:
-                return getChangedFunction(function, "%");
-            case SUBSTR:
-                return getChangedSubstringFunction(function);
-            case CURRENT_DATE:
-                return "CURRENT_DATE";
-            case DATE_TRUNC:
-                return changeDateTrunc(function);
-            case BIT_AND:
-                return getChangedFunction(function, "&");
-            case BIT_OR:
-                return getChangedFunction(function, "|");
-            case BIT_XOR:
-                return getChangedFunction(function, "^");
-            default:
-                return super.visit(function);
+        case CONCAT:
+            return getCastedFunction("CONCAT", function);
+        case REPEAT:
+            return getCastedFunction("REPEAT", function);
+        case UPPER:
+            return getCastedFunction("UPPER", function);
+        case LOWER:
+            return getCastedFunction("LOWER", function);
+        case DIV:
+            return getChangedFunction(function, "DIV");
+        case MOD:
+            return getChangedFunction(function, "%");
+        case SUBSTR:
+            return getChangedSubstringFunction(function);
+        case CURRENT_DATE:
+            return "CURRENT_DATE";
+        case DATE_TRUNC:
+            return changeDateTrunc(function);
+        case BIT_AND:
+            return getChangedFunction(function, "&");
+        case BIT_OR:
+            return getChangedFunction(function, "|");
+        case BIT_XOR:
+            return getChangedFunction(function, "^");
+        default:
+            return super.visit(function);
         }
     }
 
@@ -221,18 +186,4 @@ public class HiveSqlGenerationVisitor extends SqlGenerationVisitor {
         builder.append(")");
         return builder.toString();
     }
-
-    private final Predicate<SqlNode> nodeRequiresCast = node -> {
-        try {
-            if (node.getType() == SqlNodeType.COLUMN) {
-                final SqlColumn column = (SqlColumn) node;
-                return getTypeNameFromColumn(column).equals(BINARY_TYPE_NAME);
-            }
-            return false;
-        } catch (final AdapterException exception) {
-            throw new SqlGenerationVisitorException(ExaError.messageBuilder("E-VS-HIVE-2") //
-                    .message("Exception during deserialization of ColumnAdapterNotes.").toString(),
-                    exception);
-        }
-    };
 }
