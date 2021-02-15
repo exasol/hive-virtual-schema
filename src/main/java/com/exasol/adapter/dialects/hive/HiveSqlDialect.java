@@ -15,9 +15,10 @@ import java.util.*;
 import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.capabilities.Capabilities;
 import com.exasol.adapter.dialects.*;
+import com.exasol.adapter.dialects.rewriting.ImportIntoTemporaryTableQueryRewriter;
+import com.exasol.adapter.dialects.rewriting.SqlGenerationContext;
 import com.exasol.adapter.jdbc.*;
 import com.exasol.adapter.sql.ScalarFunction;
-import com.exasol.adapter.sql.SqlNodeVisitor;
 import com.exasol.errorreporting.ExaError;
 
 /**
@@ -118,7 +119,7 @@ public class HiveSqlDialect extends AbstractSqlDialect {
     }
 
     @Override
-    public SqlNodeVisitor<String> getSqlGenerationVisitor(final SqlGenerationContext context) {
+    public SqlGenerator getSqlGenerator(final SqlGenerationContext context) {
         return new HiveSqlGenerationVisitor(this, context);
     }
 
@@ -137,8 +138,8 @@ public class HiveSqlDialect extends AbstractSqlDialect {
         try {
             return new HiveMetadataReader(this.connectionFactory.getConnection(), this.properties);
         } catch (final SQLException exception) {
-            throw new RemoteMetadataReaderException(ExaError.messageBuilder("E-VS-HIVE-1").message(
-                    "Unable to create Hive remote metadata reader. Caused by: {{cause}}") //
+            throw new RemoteMetadataReaderException(ExaError.messageBuilder("E-VS-HIVE-1")
+                    .message("Unable to create Hive remote metadata reader. Caused by: {{cause}}") //
                     .unquotedParameter("cause", exception.getMessage()).toString(), exception);
         }
     }
@@ -151,6 +152,6 @@ public class HiveSqlDialect extends AbstractSqlDialect {
 
     @Override
     protected QueryRewriter createQueryRewriter() {
-        return new ImportIntoQueryRewriter(this, createRemoteMetadataReader(), this.connectionFactory);
+        return new ImportIntoTemporaryTableQueryRewriter(this, createRemoteMetadataReader(), this.connectionFactory);
     }
 }

@@ -1,15 +1,15 @@
 package com.exasol.adapter.dialects.hive;
 
-import com.exasol.adapter.AdapterProperties;
-import com.exasol.adapter.dialects.IdentifierConverter;
-import com.exasol.adapter.jdbc.BaseColumnMetadataReader;
-import com.exasol.adapter.jdbc.JdbcTypeDescription;
-import com.exasol.adapter.metadata.DataType;
+import static com.exasol.adapter.dialects.hive.HiveProperties.HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY;
 
 import java.sql.Connection;
 import java.sql.Types;
 
-import static com.exasol.adapter.dialects.hive.HiveProperties.HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY;
+import com.exasol.adapter.AdapterProperties;
+import com.exasol.adapter.dialects.IdentifierConverter;
+import com.exasol.adapter.jdbc.BaseColumnMetadataReader;
+import com.exasol.adapter.jdbc.JDBCTypeDescription;
+import com.exasol.adapter.metadata.DataType;
 
 /**
  * This class implements Hive-specific reading of column metadata.
@@ -29,7 +29,7 @@ public class HiveColumnMetadataReader extends BaseColumnMetadataReader {
     }
 
     @Override
-    public DataType mapJdbcType(final JdbcTypeDescription jdbcTypeDescription) {
+    public DataType mapJdbcType(final JDBCTypeDescription jdbcTypeDescription) {
         final int jdbcType = jdbcTypeDescription.getJdbcType();
         if (jdbcType == Types.DECIMAL) {
             return mapDecimal(jdbcTypeDescription);
@@ -40,7 +40,7 @@ public class HiveColumnMetadataReader extends BaseColumnMetadataReader {
         }
     }
 
-    protected DataType mapDecimal(final JdbcTypeDescription jdbcTypeDescription) {
+    protected DataType mapDecimal(final JDBCTypeDescription jdbcTypeDescription) {
         final int jdbcPrecision = jdbcTypeDescription.getPrecisionOrSize();
         final int scale = jdbcTypeDescription.getDecimalScale();
         if (jdbcPrecision <= DataType.MAX_EXASOL_DECIMAL_PRECISION) {

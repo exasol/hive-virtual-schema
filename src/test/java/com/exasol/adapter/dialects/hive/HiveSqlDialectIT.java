@@ -85,12 +85,10 @@ class HiveSqlDialectIT {
         final ConnectionDefinition connectionDefinition = exasolFactory.createConnectionDefinition(JDBC_CONNECTION_NAME,
                 connectionString, HIVE_USERNAME, HIVE_PASSWORD);
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC).adapterScript(adapterScript)
-                .connectionDefinition(connectionDefinition).dialectName("HIVE")
-                .properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)).build();
+                .connectionDefinition(connectionDefinition).properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)).build();
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL)
-                .adapterScript(adapterScript).connectionDefinition(connectionDefinition).dialectName("HIVE")
-                .properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE, "hive_cast_number_to_decimal_with_precision_and_scale",
-                        "36,2"))
+                .adapterScript(adapterScript).connectionDefinition(connectionDefinition).properties(Map
+                        .of("SCHEMA_NAME", SCHEMA_HIVE, "hive_cast_number_to_decimal_with_precision_and_scale", "36,2"))
                 .build();
     }
 
@@ -618,7 +616,7 @@ class HiveSqlDialectIT {
     }
 
     private static void uploadDriverToBucket(final String driverName, final String resourcesDialectName,
-                                               final Bucket bucket) throws InterruptedException, BucketAccessException, TimeoutException {
+            final Bucket bucket) throws InterruptedException, BucketAccessException, TimeoutException {
         final Path pathToSettingsFile = Path.of("src", "test", "resources", "integration", "driver",
                 resourcesDialectName, JDBC_DRIVER_CONFIGURATION_FILE_NAME);
         bucket.uploadFile(PATH_TO_VIRTUAL_SCHEMAS_JAR, VIRTUAL_SCHEMAS_JAR_NAME_AND_VERSION);
