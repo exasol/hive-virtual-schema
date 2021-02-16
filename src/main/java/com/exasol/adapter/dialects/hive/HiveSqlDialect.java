@@ -40,12 +40,13 @@ public class HiveSqlDialect extends AbstractSqlDialect {
                 .addLiteral(NULL, BOOL, DATE, TIMESTAMP, DOUBLE, EXACTNUMERIC, STRING)
                 .addAggregateFunction(COUNT, COUNT_STAR, COUNT_DISTINCT, SUM, SUM_DISTINCT, MIN, MAX, AVG, AVG_DISTINCT,
                         STDDEV_POP, STDDEV_POP_DISTINCT, STDDEV_SAMP, STDDEV_SAMP_DISTINCT, VAR_POP, VAR_POP_DISTINCT,
-                        VAR_SAMP, VAR_SAMP_DISTINCT)
+                        VAR_SAMP, VAR_SAMP_DISTINCT, COUNT_TUPLE)
                 .addScalarFunction(ADD, SUB, MULT, FLOAT_DIV, NEG, ABS, ACOS, ASIN, ATAN, CEIL, COS, DEGREES, DIV, EXP,
                         FLOOR, LN, LOG, MOD, POWER, RADIANS, SIGN, SIN, SQRT, TAN, ASCII, CONCAT, LENGTH, LOWER, LPAD,
                         REPEAT, REVERSE, RPAD, SOUNDEX, SPACE, SUBSTR, TRANSLATE, UPPER, ADD_DAYS, ADD_MONTHS,
                         CURRENT_DATE, CURRENT_TIMESTAMP, DATE_TRUNC, DAY, DAYS_BETWEEN, MINUTE, MONTH, MONTHS_BETWEEN,
-                        SECOND, WEEK, CAST, BIT_AND, BIT_OR, BIT_XOR, CURRENT_USER) //
+                        SECOND, WEEK, CAST, BIT_AND, BIT_OR, BIT_XOR, CURRENT_USER, BIT_LSHIFT, BIT_RSHIFT, HOUR,
+                        INITCAP)//
                 .build();
     }
 
@@ -130,6 +131,8 @@ public class HiveSqlDialect extends AbstractSqlDialect {
         scalarAliases.put(ScalarFunction.DAYS_BETWEEN, "DATEDIFF");
         scalarAliases.put(ScalarFunction.WEEK, "WEEKOFYEAR");
         scalarAliases.put(ScalarFunction.CURRENT_USER, "CURRENT_USER()");
+        scalarAliases.put(ScalarFunction.BIT_LSHIFT, "SHIFTLEFT");
+        scalarAliases.put(ScalarFunction.BIT_RSHIFT, "SHIFTRIGHT");
         return scalarAliases;
     }
 

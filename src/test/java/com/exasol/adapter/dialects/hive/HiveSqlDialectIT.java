@@ -3,10 +3,12 @@ package com.exasol.adapter.dialects.hive;
 import static com.exasol.adapter.dialects.IntegrationTestConstants.*;
 import static com.exasol.dbbuilder.dialects.exasol.AdapterScript.Language.JAVA;
 import static com.exasol.matcher.ResultSetMatcher.matchesResultSet;
+import static com.exasol.matcher.ResultSetStructureMatcher.table;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -17,6 +19,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import com.exasol.bucketfs.Bucket;
+import com.exasol.dbbuilder.dialects.*;
+import com.exasol.matcher.TypeMatchMode;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +37,7 @@ import com.exasol.dbbuilder.dialects.exasol.*;
 
 /**
  * How to run `HiveSqlDialectIT`: See the documentation <a
- * href="doc/development/developing-sql-dialect/integration_testing_with_containers.md>integration_testing_with_containers.md</a>.
+ * href="doc/user_guide/hive_user_guide.md</a>.
  */
 @Tag("integration")
 @Testcontainers
@@ -51,6 +56,7 @@ class HiveSqlDialectIT {
     private static final String TABLE_HIVE_ALL_DATA_TYPES = "TABLE_HIVE_ALL_DATA_TYPES";
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC = "VIRTUAL_SCHEMA_HIVE_JDBC";
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL = "VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL";
+    private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
     @Container
     public static DockerComposeContainer<? extends DockerComposeContainer<?>> hiveContainer = new DockerComposeContainer<>(
             new File(HIVE_DOCKER_COMPOSE_YAML)) //
@@ -59,7 +65,12 @@ class HiveSqlDialectIT {
     private static final ExasolContainer<? extends ExasolContainer<?>> exasolContainer = new ExasolContainer<>(
             EXASOL_DOCKER_IMAGE_REFERENCE) //
                     .withLogConsumer(new Slf4jLogConsumer(LOGGER)).withReuse(true); //
+    private static Connection exasolConnection;
     private static Statement statementExasol;
+    private static ExasolObjectFactory exasolFactory;
+    private static AdapterScript adapterScript;
+    private static ConnectionDefinition connectionDefinition;
+    private VirtualSchema virtualSchema;
 
     @BeforeAll
     static void beforeAll()
@@ -67,8 +78,7 @@ class HiveSqlDialectIT {
         final String driverName = getPropertyFromFile(RESOURCES_FOLDER_DIALECT_NAME, "driver.name");
         uploadDriverToBucket(driverName, RESOURCES_FOLDER_DIALECT_NAME, exasolContainer.getDefaultBucket());
         uploadVsJarToBucket(exasolContainer.getDefaultBucket());
-        final Connection exasolConnection = exasolContainer.createConnectionForUser(exasolContainer.getUsername(),
-                exasolContainer.getPassword());
+        exasolConnection = exasolContainer.createConnection("");
         statementExasol = exasolConnection.createStatement();
         try (final Connection connection = getHiveConnection()) {
             final Statement statementHive = connection.createStatement();
@@ -77,19 +87,43 @@ class HiveSqlDialectIT {
             createTableAllDataTypes(statementHive);
             createTestTablesForJoinTests(connection, SCHEMA_HIVE);
         }
-        final ExasolObjectFactory exasolFactory = new ExasolObjectFactory(exasolContainer.createConnection(""));
+        exasolFactory = new ExasolObjectFactory(exasolConnection);
         final ExasolSchema schema = exasolFactory.createSchema(SCHEMA_EXASOL);
-        final AdapterScript adapterScript = createAdapterScript(driverName, schema);
+        adapterScript = createAdapterScript(driverName, schema);
         final String connectionString = "jdbc:hive2://" + DOCKER_IP_ADDRESS + ":" + HIVE_EXPOSED_PORT + "/"
                 + SCHEMA_HIVE;
-        final ConnectionDefinition connectionDefinition = exasolFactory.createConnectionDefinition(JDBC_CONNECTION_NAME,
-                connectionString, HIVE_USERNAME, HIVE_PASSWORD);
+        connectionDefinition = exasolFactory.createConnectionDefinition(JDBC_CONNECTION_NAME, connectionString,
+                HIVE_USERNAME, HIVE_PASSWORD);
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC).adapterScript(adapterScript)
                 .connectionDefinition(connectionDefinition).properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)).build();
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL)
                 .adapterScript(adapterScript).connectionDefinition(connectionDefinition).properties(Map
                         .of("SCHEMA_NAME", SCHEMA_HIVE, "hive_cast_number_to_decimal_with_precision_and_scale", "36,2"))
                 .build();
+    }
+
+    @AfterAll
+    static void afterAll() throws SQLException {
+        exasolConnection.close();
+        statementExasol.close();
+    }
+
+    @AfterEach
+    void afterEach() throws SQLException, ClassNotFoundException {
+        try (final Connection connection = getHiveConnection()) {
+            final Statement statementHive = connection.createStatement();
+            statementHive.execute("DROP TABLE IF EXISTS " + HIVE_SOURCE_TABLE);
+        }
+        dropAll(this.virtualSchema);
+        this.virtualSchema = null;
+    }
+
+    private static void dropAll(final DatabaseObject... databaseObjects) {
+        for (final DatabaseObject databaseObject : databaseObjects) {
+            if (databaseObject != null) {
+                databaseObject.drop();
+            }
+        }
     }
 
     private static Connection getHiveConnection() throws ClassNotFoundException, SQLException {
@@ -161,23 +195,6 @@ class HiveSqlDialectIT {
                 + "%jar /buckets/bfsdefault/default/" + VIRTUAL_SCHEMAS_JAR_NAME_AND_VERSION + ";\n" //
                 + "%jar /buckets/bfsdefault/default/drivers/jdbc/" + driverName + ";\n";
         return schema.createAdapterScript(ADAPTER_SCRIPT_EXASOL, JAVA, content);
-    }
-
-    @Test
-    void testSetup() throws SQLException {
-        final String query = "SELECT X FROM " + VIRTUAL_SCHEMA_HIVE_JDBC + "." + TABLE_HIVE_SIMPLE;
-        assertExpressionExecutionLongResult(query, 99L);
-    }
-
-    private void assertExpressionExecutionLongResult(final String query, final long expected) throws SQLException {
-        final ResultSet result = statementExasol.executeQuery(query);
-        result.next();
-        final long actualResult = result.getLong(1);
-        assertThat(actualResult, equalTo(expected));
-    }
-
-    private Connection getExasolConnection() throws SQLException {
-        return exasolContainer.createConnection("");
     }
 
     @Nested
@@ -615,6 +632,84 @@ class HiveSqlDialectIT {
         assertThat(statementExasol.executeQuery(query), matchesResultSet(expected));
     }
 
+    @Test
+    void testLeftShiftScalarFunction() throws SQLException, ClassNotFoundException {
+        createHiveTable("bigint_col BIGINT, int_col INT", List.of("10, 3"));
+        this.virtualSchema = createVirtualSchema();
+        final String query = "SELECT BIT_LSHIFT(bigint_col, int_col) FROM " + this.virtualSchema.getName() + "."
+                + HIVE_SOURCE_TABLE;
+        assertVsQuery(query, table().row(80).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
+    }
+
+    private void createHiveTable(final String columns, final List<String> values)
+            throws SQLException, ClassNotFoundException {
+        try (final Connection connection = getHiveConnection()) {
+            final Statement statementHive = connection.createStatement();
+            statementHive.execute("CREATE TABLE " + HIVE_SOURCE_TABLE + "(" + columns + ")");
+            statementHive.execute("TRUNCATE TABLE " + HIVE_SOURCE_TABLE);
+            for (final String value : values) {
+                statementHive.execute("INSERT INTO " + HIVE_SOURCE_TABLE + " VALUES (" + value + ")");
+            }
+        }
+    }
+
+    private VirtualSchema createVirtualSchema() {
+        return exasolFactory.createVirtualSchemaBuilder("THE_VS") //
+                .adapterScript(adapterScript) //
+                .connectionDefinition(connectionDefinition) //
+                .properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)) //
+                .build();
+    }
+
+    private void assertVsQuery(final String sql, final Matcher<ResultSet> expected) {
+        try {
+            assertThat(query(sql), expected);
+        } catch (final SQLException exception) {
+            fail("Unable to run assertion query: " + sql + "\nCaused by: " + exception.getMessage());
+        }
+    }
+
+    private ResultSet query(final String sql) throws SQLException {
+        return exasolConnection.createStatement().executeQuery(sql);
+    }
+
+    @Test
+    void testRightShiftScalarFunction() throws SQLException, ClassNotFoundException {
+        createHiveTable("bigint_col BIGINT, int_col INT", List.of("10, 3"));
+        this.virtualSchema = createVirtualSchema();
+        final String query = "SELECT BIT_RSHIFT(bigint_col, int_col) FROM " + this.virtualSchema.getName() + "."
+                + HIVE_SOURCE_TABLE;
+        assertVsQuery(query, table().row(1).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
+    }
+
+    @Test
+    void testHourScalarFunction() throws SQLException, ClassNotFoundException {
+        createHiveTable("timestamp_col TIMESTAMP", List.of("'2021-02-16 11:48:01'"));
+        this.virtualSchema = createVirtualSchema();
+        final String query = "SELECT HOUR(timestamp_col) FROM " + this.virtualSchema.getName() + "."
+                + HIVE_SOURCE_TABLE;
+        assertVsQuery(query, table().row(11).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
+    }
+
+    @Test
+    void testInitcapScalarFunction() throws SQLException, ClassNotFoundException {
+        createHiveTable("varchar_col VARCHAR(100)", List.of("'CaTS are grEAt!'"));
+        this.virtualSchema = createVirtualSchema();
+        final String query = "SELECT INITCAP(varchar_col) FROM " + this.virtualSchema.getName() + "."
+                + HIVE_SOURCE_TABLE;
+        assertVsQuery(query, table().row("Cats Are Great!").matches());
+    }
+
+    @Test
+    void testCountTupleAggregateFunction() throws SQLException, ClassNotFoundException {
+        createHiveTable("varchar_col VARCHAR(10), int_col INT",
+                List.of("'one', 1", "'two', 2", "'one', 1", "'two', 2"));
+        this.virtualSchema = createVirtualSchema();
+        final String query = "SELECT COUNT(DISTINCT (varchar_col, int_col)) FROM " + this.virtualSchema.getName() + "."
+                + HIVE_SOURCE_TABLE;
+        assertVsQuery(query, table().row(2).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
+    }
+
     private static void uploadDriverToBucket(final String driverName, final String resourcesDialectName,
             final Bucket bucket) throws InterruptedException, BucketAccessException, TimeoutException {
         final Path pathToSettingsFile = Path.of("src", "test", "resources", "integration", "driver",
@@ -662,8 +757,7 @@ class HiveSqlDialectIT {
 
     private ResultSet getExpectedResultSet(final List<String> expectedColumns, final List<String> expectedRows)
             throws SQLException {
-        final Connection connection = getExasolConnection();
-        try (final Statement statement = connection.createStatement()) {
+        try (final Statement statement = exasolConnection.createStatement()) {
             final String expectedValues = expectedRows.stream().map(row -> "(" + row + ")")
                     .collect(Collectors.joining(","));
             final String qualifiedExpectedTableName = SCHEMA_EXASOL + ".EXPECTED";
@@ -675,8 +769,7 @@ class HiveSqlDialectIT {
     }
 
     private ResultSet getActualResultSet(final String query) throws SQLException {
-        final Connection connection = getExasolConnection();
-        try (final Statement statement = connection.createStatement()) {
+        try (final Statement statement = exasolConnection.createStatement()) {
             return statement.executeQuery(query);
         }
     }

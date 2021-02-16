@@ -6,6 +6,10 @@ Code name: Removed `SQL_DIALECT` property
 
 The `SQL_DIALECT` property used when executing a `CREATE VIRTUAL SCHEMA` from the Exasol database is obsolete from this version. Please, do not provide this property anymore.
 
+## Feature
+
+* #7: Added new capabilities for scalar and aggregate functions. 
+
 ## Documentation
 
 * #3: Added information about integration tests.
