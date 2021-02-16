@@ -6,6 +6,10 @@ Code name: Removed `SQL_DIALECT` property
 
 The `SQL_DIALECT` property used when executing a `CREATE VIRTUAL SCHEMA` from the Exasol database is obsolete from this version. Please, do not provide this property anymore.
 
+## Feature
+
+* #7: Added new capabilities for scalar and aggregate functions. 
+
 ## Documentation
 
 * #3: Added information about integration tests.
@@ -32,6 +36,7 @@ The `SQL_DIALECT` property used when executing a `CREATE VIRTUAL SCHEMA` from th
 * Updated `org.testcontainers:junit-jupiter:1.15.0` to `1.15.2`
 * Updated `org.apache.hbase:hbase-server:2.4.0` to `2.4.1`
 * Updated `org.junit.jupiter:junit-jupiter:5.7.0` to `5.7.1`
+* Updated `com.exasol:exasol-jdbc:7.0.4` to `7.0.7`
 
 ### Plugin Dependencies
 

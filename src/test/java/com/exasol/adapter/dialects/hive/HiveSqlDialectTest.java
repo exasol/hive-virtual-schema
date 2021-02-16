@@ -54,14 +54,14 @@ class HiveSqlDialectTest {
                 () -> assertThat(capabilities.getAggregateFunctionCapabilities(),
                         containsInAnyOrder(COUNT, COUNT_STAR, COUNT_DISTINCT, SUM, SUM_DISTINCT, MIN, MAX, AVG,
                                 AVG_DISTINCT, STDDEV_POP, STDDEV_POP_DISTINCT, STDDEV_SAMP, STDDEV_SAMP_DISTINCT,
-                                VAR_POP, VAR_POP_DISTINCT, VAR_SAMP, VAR_SAMP_DISTINCT)),
+                                VAR_POP, VAR_POP_DISTINCT, VAR_SAMP, VAR_SAMP_DISTINCT, COUNT_TUPLE)),
                 () -> assertThat(capabilities.getScalarFunctionCapabilities(),
                         containsInAnyOrder(ADD, SUB, MULT, FLOAT_DIV, NEG, ABS, ACOS, ASIN, ATAN, CEIL, COS, DEGREES,
                                 DIV, EXP, FLOOR, LN, LOG, MOD, POWER, RADIANS, SIGN, SIN, SQRT, TAN, ASCII, CONCAT,
                                 LENGTH, LOWER, LPAD, REPEAT, REVERSE, RPAD, SOUNDEX, SPACE, SUBSTR, TRANSLATE, UPPER,
                                 ADD_DAYS, ADD_MONTHS, CURRENT_DATE, CURRENT_TIMESTAMP, DATE_TRUNC, DAY, DAYS_BETWEEN,
                                 MINUTE, MONTH, MONTHS_BETWEEN, SECOND, WEEK, CAST, BIT_AND, BIT_OR, BIT_XOR,
-                                CURRENT_USER)));
+                                CURRENT_USER, BIT_LSHIFT, BIT_RSHIFT, HOUR, INITCAP)));
     }
 
     @Test
