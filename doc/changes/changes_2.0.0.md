@@ -1,4 +1,4 @@
-# Hive Virtual Schemas 2.0.0, released 2021-02-??
+# Hive Virtual Schemas 2.0.0, released 2021-02-17
 
 Code name: Removed `SQL_DIALECT` property
 
