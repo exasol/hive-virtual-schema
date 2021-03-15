@@ -57,11 +57,8 @@ Running the Virtual Schema requires a Java Runtime version 11 or later.
 | Dependency                                           | Purpose                                                | License                    |
 |------------------------------------------------------|--------------------------------------------------------|----------------------------|
 | [Apache Maven](https://maven.apache.org/)            | Build tool                                             | Apache License 2.0         |
-| [Apache Trift][apache-trift]                         | Need for Hive integration test                         | Apache License 2.0         |
 | [Exasol JDBC Driver][exasol-jdbc-driver]             | JDBC driver for Exasol database                        | MIT License                |
 | [Exasol Testcontainers][exasol-testcontainers]       | Exasol extension for the Testcontainers framework      | MIT License                |
-| [HBase server][hbase-server]                         | The Hadoop database                                    | Apache License 2.0         |
-| [Hive JDBC Driver][hive-jdbc-driver]                 | JDBC driver for Hive database                          | Apache License 2.0         |
 | [Java Hamcrest](http://hamcrest.org/JavaHamcrest/)   | Checking for conditions in code via matchers           | BSD License                |
 | [JUnit](https://junit.org/junit5)                    | Unit testing framework                                 | Eclipse Public License 1.0 |
 | [Mockito](http://site.mockito.org/)                  | Mocking framework                                      | MIT License                |
@@ -88,11 +85,8 @@ Running the Virtual Schema requires a Java Runtime version 11 or later.
 [error-reporting-java]: https://github.com/exasol/error-reporting-java/
 [hive-jdbc-driver]: https://www.cloudera.com/downloads/connectors/hive/jdbc/2-6-10.html
 
-[apache-trift]: http://thrift.apache.org/
 [exasol-jdbc-driver]: https://www.exasol.com/portal/display/DOWNLOAD/Exasol+Download+Section
 [exasol-testcontainers]: https://github.com/exasol/exasol-testcontainers
-[hbase-server]: http://hbase.apache.org/
-[hive-jdbc-driver]: https://github.com/apache/hive/tree/master/jdbc/src/java/org/apache/hive/jdbc
 [test-bd-builder]: https://github.com/exasol/test-db-builder-java
 
 [maven-jacoco-plugin]: https://www.eclemma.org/jacoco/trunk/doc/maven.html

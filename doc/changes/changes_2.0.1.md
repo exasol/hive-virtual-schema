@@ -4,7 +4,8 @@ Code name:
 
 ## Refactoring
 
-* #16:Removed detected vulnerabilities in transitive dependencies.
+* #16: Removed detected vulnerabilities in transitive dependencies.
+* #19: Removed all Hive dependencies from pom.xml file and added runtime loading for Hive JDBC driver.
 
 ## Dependencies Updates
 
@@ -16,7 +17,7 @@ Code name:
 
 ### Test Dependencies
 
-* Excluded transitive dependency `org.apache.hadoop:hadoop-hdfs-client`
-* Excluded transitive dependency `org.apache.hadoop:hadoop-auth`
-* Excluded transitive dependency `org.apache.hadoop:hadoop-mapreduce-client-core`
-* Excluded transitive dependency `org.apache.hadoop:hadoop-common`
+* Removed `org.apache.hive:hive-jdbc`
+* Removed `org.apache.hbase:hbase-server`
+* Removed `org.apache.httpcomponents:httpclient`
+* Removed `org.apache.thrift:libthrift`
