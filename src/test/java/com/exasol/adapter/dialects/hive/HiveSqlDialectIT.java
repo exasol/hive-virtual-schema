@@ -128,12 +128,16 @@ class HiveSqlDialectIT {
 
     private static Connection getHiveConnection() throws ClassNotFoundException, SQLException, MalformedURLException,
             IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        final Driver driver = loadJDBCDriver();
+        return driver.connect("jdbc:hive2://localhost:" + HIVE_EXPOSED_PORT + "/" + SCHEMA_HIVE, new Properties());
+    }
+
+    private static Driver loadJDBCDriver() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         final File file = new File("src/test/resources/integration/driver/hive/HiveJDBC41.jar");
         final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { file.toURI().toURL() },
                 HiveSqlDialectIT.class.getClassLoader());
         final Class<?> driverClass = urlClassLoader.loadClass("com.cloudera.hive.jdbc41.HS2Driver");
-        final Driver driver = (Driver) driverClass.getDeclaredConstructor().newInstance();
-        return driver.connect("jdbc:hive2://localhost:" + HIVE_EXPOSED_PORT + "/" + SCHEMA_HIVE, new Properties());
+        return (Driver) driverClass.getDeclaredConstructor().newInstance();
     }
 
     private static void createTableHiveSimple(final Statement statementHive) throws SQLException {
