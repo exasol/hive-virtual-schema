@@ -372,6 +372,6 @@ The reason for the tests being disabled is we can only deliver drivers where the
 
 1. Download the [Hive JDBC driver `HiveJDBC41.jar`](https://www.cloudera.com/downloads/connectors/hive/jdbc/2-5-4.html)
 2. Temporarily put the driver into `src/test/resources/integration/driver/hive` directory.
-3. If the driver's name is different (you renamed the file, or it has a different version number, for example) from the mentioned above, edit `src/test/resources/integration/driver/hive/hive.properties` and `settings.cfg` files.
+3. Make sure that the file's name is `HiveJDBC41.jar`.
 4. Run the tests from an IDE or temporarily comment out `excludes` section of `maven-failsafe-plugin` and execute `mvn verify` command.
 5. **Do not upload the driver to the GitHub repository**.	
