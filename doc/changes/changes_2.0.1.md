@@ -1,6 +1,11 @@
-# Hive Virtual Schemas 2.0.1, released 2021-??-??
+# Hive Virtual Schemas 2.0.1, released 2021-08-12
 
-Code name:
+Code name: Dependency Updates
+
+## Summary
+
+In this release we updated the dependencies. By that we fixed transitive CVE-2021-36090.
+
 
 ## Refactoring
 
@@ -21,6 +26,7 @@ Code name:
 * Removed `org.apache.hbase:hbase-server`
 * Removed `org.apache.httpcomponents:httpclient`
 * Removed `org.apache.thrift:libthrift`
+
 ## Dependency Updates
 
 ### Compile Dependency Updates
