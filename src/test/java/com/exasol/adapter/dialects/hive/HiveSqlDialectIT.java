@@ -10,7 +10,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.*;
@@ -20,9 +21,6 @@ import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import com.exasol.bucketfs.Bucket;
-import com.exasol.dbbuilder.dialects.*;
-import com.exasol.matcher.TypeMatchMode;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
@@ -33,9 +31,12 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.exasol.bucketfs.Bucket;
 import com.exasol.bucketfs.BucketAccessException;
 import com.exasol.containers.ExasolContainer;
+import com.exasol.dbbuilder.dialects.DatabaseObject;
 import com.exasol.dbbuilder.dialects.exasol.*;
+import com.exasol.matcher.TypeMatchMode;
 
 /**
  * How to run `HiveSqlDialectIT`: See the documentation <a href="doc/user_guide/hive_user_guide.md</a>.
@@ -74,9 +75,9 @@ class HiveSqlDialectIT {
     private static Connection hiveConnection;
 
     @BeforeAll
-    static void beforeAll() throws InterruptedException, BucketAccessException, TimeoutException, SQLException,
+    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException,
             ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException,
-            NoSuchMethodException, InvocationTargetException {
+            NoSuchMethodException, InvocationTargetException, FileNotFoundException {
         uploadDriverToBucket();
         uploadVsJarToBucket(EXASOL.getDefaultBucket());
         exasolConnection = EXASOL.createConnection("");
@@ -716,7 +717,7 @@ class HiveSqlDialectIT {
         assertVsQuery(query, table().row(2).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
     }
 
-    private static void uploadDriverToBucket() throws InterruptedException, BucketAccessException, TimeoutException {
+    private static void uploadDriverToBucket() throws BucketAccessException, TimeoutException, FileNotFoundException {
         final Bucket bucket = EXASOL.getDefaultBucket();
         final Path pathToSettingsFile = Path.of("src", "test", "resources", "integration", "driver", "hive",
                 JDBC_DRIVER_CONFIGURATION_FILE_NAME);
@@ -726,7 +727,7 @@ class HiveSqlDialectIT {
     }
 
     private static void uploadVsJarToBucket(final Bucket bucket)
-            throws InterruptedException, BucketAccessException, TimeoutException {
+            throws BucketAccessException, TimeoutException, FileNotFoundException {
         bucket.uploadFile(PATH_TO_VIRTUAL_SCHEMAS_JAR, VIRTUAL_SCHEMAS_JAR_NAME_AND_VERSION);
     }
 
