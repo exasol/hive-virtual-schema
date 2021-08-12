@@ -46,10 +46,10 @@
 | [Apache Maven Site Plugin][56]                          | [Apache License, Version 2.0][23] |
 
 [38]: https://github.com/exasol/project-keeper-maven-plugin
-[13]: LICENSE-exasol-jdbc.txt
 [2]: https://github.com/exasol/error-reporting-java
 [35]: http://www.apache.org/licenses/LICENSE-2.0.txt
 [22]: https://maven.apache.org/surefire/maven-surefire-plugin/
+[13]: https://www.exasol.com/support/secure/attachment/155343/EXASOL_SDK-7.0.11.tar.gz
 [1]: https://opensource.org/licenses/MIT
 [10]: https://github.com/mockito/mockito
 [30]: https://maven.apache.org/surefire/maven-failsafe-plugin/
