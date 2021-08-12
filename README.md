@@ -12,7 +12,7 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com.exasol%3Ahive-virtual-schema&metric=code_smells)](https://sonarcloud.io/dashboard?id=com.exasol%3Ahive-virtual-schema)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.exasol%3Ahive-virtual-schema&metric=coverage)](https://sonarcloud.io/dashboard?id=com.exasol%3Ahive-virtual-schema)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=com.exasol%3Ahive-virtual-schema&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=com.exasol%3Ahive-virtual-schema)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=com.exasol%3Ahive-virtual-schema&metric=ncloc)](https://sonarcloud.io/dashboard?id=com.exasol%3Ahive-virtual-schema)'
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=com.exasol%3Ahive-virtual-schema&metric=ncloc)](https://sonarcloud.io/dashboard?id=com.exasol%3Ahive-virtual-schema)
 
 # Overview
 
