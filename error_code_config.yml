@@ -2,3 +2,4 @@ error-tags:
   VS-HIVE:
     packages:
       - com.exasol.adapter.dialects.hive
+    highest-index: 3
