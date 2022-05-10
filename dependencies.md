@@ -19,7 +19,7 @@
 | [EXASolution JDBC Driver][12]                   | [EXAClient License][13]          |
 | [Test containers for Exasol on Docker][14]      | [MIT][1]                         |
 | [Testcontainers :: JUnit Jupiter Extension][16] | [MIT][17]                        |
-| [Test Database Builder for Java][18]            | [MIT][1]                         |
+| [Test Database Builder for Java][18]            | [MIT License][19]                |
 | [Matcher for SQL Result Sets][20]               | [MIT][1]                         |
 
 ## Plugin Dependencies
@@ -47,19 +47,20 @@
 
 [38]: https://github.com/exasol/project-keeper-maven-plugin
 [2]: https://github.com/exasol/error-reporting-java
+[18]: https://github.com/exasol/test-db-builder-java/
 [35]: http://www.apache.org/licenses/LICENSE-2.0.txt
 [22]: https://maven.apache.org/surefire/maven-surefire-plugin/
 [13]: https://www.exasol.com/support/secure/attachment/155343/EXASOL_SDK-7.0.11.tar.gz
 [1]: https://opensource.org/licenses/MIT
 [10]: https://github.com/mockito/mockito
 [30]: https://maven.apache.org/surefire/maven-failsafe-plugin/
-[18]: https://github.com/exasol/test-db-builder-java
 [32]: http://www.mojohaus.org/versions-maven-plugin/
 [7]: http://opensource.org/licenses/BSD-3-Clause
 [26]: https://maven.apache.org/plugins/maven-compiler-plugin/
 [17]: http://opensource.org/licenses/MIT
 [50]: https://maven.apache.org/plugins/maven-resources-plugin/
 [0]: https://github.com/exasol/virtual-schema-common-jdbc
+[19]: https://github.com/exasol/test-db-builder-java/blob/main/LICENSE
 [48]: https://maven.apache.org/plugins/maven-clean-plugin/
 [25]: https://www.eclipse.org/legal/epl-2.0/
 [54]: https://maven.apache.org/plugins/maven-deploy-plugin/
