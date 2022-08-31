@@ -38,7 +38,7 @@ This release upgrades dependencies.
 * Updated `org.apache.maven.plugins:maven-compiler-plugin:3.8.1` to `3.10.1`
 * Updated `org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1` to `2.7`
 * Updated `org.apache.maven.plugins:maven-enforcer-plugin:3.0.0-M3` to `3.1.0`
-* Removed `org.apache.maven.plugins:maven-failsafe-plugin:3.0.0-M4`
+* Updated `org.apache.maven.plugins:maven-failsafe-plugin:3.0.0-M4` to `3.0.0-M5`
 * Updated `org.apache.maven.plugins:maven-install-plugin:3.0.0-M1` to `2.4`
 * Updated `org.apache.maven.plugins:maven-jar-plugin:3.2.0` to `3.2.2`
 * Updated `org.apache.maven.plugins:maven-resources-plugin:3.2.0` to `2.6`
