@@ -47,7 +47,7 @@ The SQL statement below creates the adapter script, defines the Java class that 
 ```sql
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-9.0.4-hive-2.0.2.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-9.0.5-hive-2.0.3.jar;
   %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
 /
 ```
@@ -300,7 +300,7 @@ In Virtual Schema adapter:
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %jvmoption -Dsun.security.krb5.disableReferrals=true;
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-9.0.4-hive-2.0.2.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-9.0.5-hive-2.0.3.jar;
   %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
 /
 ```
@@ -373,5 +373,5 @@ The reason for the tests being disabled is we can only deliver drivers where the
 1. Download the [Hive JDBC driver `HiveJDBC41.jar`](https://www.cloudera.com/downloads/connectors/hive/jdbc/2-5-4.html)
 2. Temporarily put the driver into `src/test/resources/integration/driver/hive` directory.
 3. Make sure that the file's name is `HiveJDBC41.jar`.
-4. Run the tests from an IDE or temporarily comment out `excludes` section of `maven-failsafe-plugin` and execute `mvn verify` command.
+4. Run the tests from an IDE or temporarily comment out the `skip` property of `maven-failsafe-plugin` and execute `mvn verify` command.
 5. **Do not upload the driver to the GitHub repository**.	
