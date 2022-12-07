@@ -162,7 +162,7 @@ Add the JDBC connection URL to the `TO` part of the connection string:
 
 ```sql
 CREATE OR REPLACE CONNECTION krb_conn
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=hive-host.example.com;KrbServiceName=hive'
+TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive'
 USER 'krbuser@EXAMPLE.COM'
 IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
 ```
@@ -173,10 +173,14 @@ Similar to the Thrift protocol, update the `TO` part of the connection string wi
 
 ```sql
 CREATE OR REPLACE CONNECTION krb_conn
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=hive-host.example.com;KrbServiceName=hive;transportMode=http;httpPath=cliservice'
+TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice'
 USER 'krbuser@EXAMPLE.COM'
 IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
 ```
+
+#### Kerberos Authentication Type
+
+As you can see we are using `KrbAuthType=1`. This allows the Hive JDBC driver to check the `java.security.auth.login.config` system property for a JAAS configuration. If a JAAS configuration is specified, the driver uses that information to create a `LoginContext` and then uses the `Subject` associated with it. Exasol Virtual Schema creates `JAAS` configuration at the runtime using the information from the `IDENTIFIED BY` part of the connection object.
 
 ### Creating the Connection
 
