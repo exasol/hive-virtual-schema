@@ -4,7 +4,7 @@
 
 ## Registering the JDBC Driver in EXAOperation
 
-First download the [Hive JDBC driver](https://www.cloudera.com/downloads/connectors/hive/jdbc/2-6-10.html).
+First download the [Hive Cloudera JDBC driver](https://www.cloudera.com/downloads/connectors/hive/jdbc/).
 
 Now register the driver in EXAOperation:
 
@@ -31,6 +31,12 @@ You need to specify the following settings when adding the JDBC driver via EXAOp
 1. Upload the driver to BucketFS
 
 This step is necessary since the UDF container the adapter runs in has no access to the JDBC drivers installed via EXAOperation but it can access BucketFS.
+
+### Difference Between Apache JDBC and Cloudera JDBC Drivers
+
+We are using Cloudera Hive JDBC driver because it provides metadata query support to build the Virtual Schema tables, column names and column types.
+
+With this in mind, please use the Cloudera JDBC properties when building a connection URL string. For example, use `SSLTrustStorePwd` instead of `sslTrustStorePassword`. You can checkout the [Cloudera Hive JDBC Manual](https://docs.cloudera.com/documentation/other/connectors/hive-jdbc/latest/Cloudera-JDBC-Driver-for-Apache-Hive-Install-Guide.pdf) for all available properties.
 
 ## Installing the Adapter Script
 
@@ -111,7 +117,44 @@ This outputs a create connection statement:
 CREATE CONNECTION krb_conn TO '' USER 'krbuser@EXAMPLE.COM' IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
 ```
 
-However, we should update it and add the JDBC connection URL to the `TO` part of the connection string.
+#### Using Correct `krb5.conf` Configuration File
+
+The regular Kerberos configuration `/etc/krb5.conf` file may contain `includedir` directives that include additional properties. To accommodate all properties in a single file, please make a copy of `/etc/krb5.conf` file and update it accordingly.
+
+Example of `/etc/krb5.conf` contents:
+
+```
+includedir /etc/krb5.conf.d/
+includedir /var/lib/sss/pubconf/krb5.include.d/
+
+[libdefaults]
+dns_lookup_kdc = false
+dns_lookup_realm = false
+...
+```
+
+Copied and changed `krb5.conf` file after adding properties from `includedir` directories:
+
+```
+# includedir /etc/krb5.conf.d/
+# includedir /var/lib/sss/pubconf/krb5.include.d/
+
+[libdefaults]
+dns_lookup_kdc = false
+dns_lookup_realm = false
+udp_preference_limit = 1
+
+[capaths]
+...
+[plugins]
+...
+```
+
+The `includedir` folders contain a file with a setting `[libdefaults]` setting `udp_preference_limit = 1`, two new categories `[capaths]` and `[plugins]` that were not in the original `krb5.conf` file. We add such settings into the copied `krb5.conf` file and use it to create the connection object.
+
+This is required since the Virtual Schema run in a sandboxed container that does not have an access to the host operating system's files.
+
+Next, we add the JDBC connection URL to the `TO` part of the connection string.
 
 #### Using Thrift protocol with Kerberos
 
@@ -139,10 +182,6 @@ IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
 
 You have to execute the generated `CREATE CONNECTION` statement directly in EXASOL to actually create the Kerberos `CONNECTION` object. For more detailed information about the script, use the help option:
 
-```sh
-python tools/create_kerberos_conn.py -h
-```
-
 ### Using the Connection When Creating a Virtual Schema
 
 You can now create a virtual schema using the Kerberos connection created before.
@@ -154,6 +193,18 @@ CREATE VIRTUAL SCHEMA <virtual schema name>
    CONNECTION_NAME = 'KRB_CONN'
    SCHEMA_NAME     = '<schema name>';
 ```
+
+### Enabling Logging
+
+You can add `LogLevel` and `LogPath` parameters to the JDBC URL (the `TO` part of connection object) to enable Hive JDBC driver and connection logs.
+
+For example:
+
+```
+TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=hive-host.example.com;KrbServiceName=hive;transportMode=http;httpPath=cliservice;LogLevel=6;LogPath=/tmp/'
+```
+
+This will create log files in the database `/tmp/` folder. Please check the `exasol_container_sockets` folder during the Virtual Schema creation or query run.
 
 ## Troubleshooting
 
@@ -374,4 +425,4 @@ The reason for the tests being disabled is we can only deliver drivers where the
 2. Temporarily put the driver into `src/test/resources/integration/driver/hive` directory.
 3. Make sure that the file's name is `HiveJDBC41.jar`.
 4. Run the tests from an IDE or temporarily comment out the `skip` property of `maven-failsafe-plugin` and execute `mvn verify` command.
-5. **Do not upload the driver to the GitHub repository**.	
+5. **Do not upload the driver to the GitHub repository**.
