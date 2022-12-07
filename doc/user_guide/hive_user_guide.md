@@ -210,6 +210,8 @@ TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.CO
 
 This will create log files in the database `/tmp/` folder. Please check the `exasol_container_sockets` folder during the Virtual Schema creation or query run.
 
+You can set the `LogLevel` to number from `0` (Disables all logging) to `6` (Logs all driver activity). For more information please checkout the [Cloudera Hive JDBC Manual](https://docs.cloudera.com/documentation/other/connectors/hive-jdbc/latest/Cloudera-JDBC-Driver-for-Apache-Hive-Install-Guide.pdf) section on "Configuring Logging".
+
 ## Troubleshooting
 
 ### Virtual Schema and Hive 1.1.0
