@@ -205,7 +205,7 @@ You can add `LogLevel` and `LogPath` parameters to the JDBC URL (the `TO` part o
 For example:
 
 ```
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=hive-host.example.com;KrbServiceName=hive;transportMode=http;httpPath=cliservice;LogLevel=6;LogPath=/tmp/'
+TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice;LogLevel=6;LogPath=/tmp/'
 ```
 
 This will create log files in the database `/tmp/` folder. Please check the `exasol_container_sockets` folder during the Virtual Schema creation or query run.
