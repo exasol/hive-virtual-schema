@@ -154,7 +154,7 @@ The `includedir` folders contain a file with a setting `[libdefaults]` setting
 
 This is required since the Virtual Schema runs in a sandboxed container that does not have an access to the host operating system's files.
 
-Next, we add the JDBC connection URL to the `TO` part of the connection string.
+Next, we add the JDBC connection URL to the `TO` part of the connection object.
 
 #### Using Thrift protocol with Kerberos
 
@@ -208,7 +208,7 @@ For example:
 TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice;LogLevel=6;LogPath=/tmp/'
 ```
 
-This will create log files in the database `/tmp/` folder. Please check the `exasol_container_sockets` folder for `HiveJDBC_driver.log` and `HiveJDBC_connection_*.log` files during the Virtual Schema creation or query run. These files will contain exception logs if there is any.
+This will create log files in a sandbox `/tmp/` folder. Please check the `exasol_container_sockets` folder for `HiveJDBC_driver.log` and `HiveJDBC_connection_*.log` files during the Virtual Schema creation or query run. These files will contain exception logs if there is any.
 
 You can set the `LogLevel` to number from `0` (Disables all logging) to `6` (Logs all driver activity). For more information please checkout the [Cloudera Hive JDBC Manual](https://docs.cloudera.com/documentation/other/connectors/hive-jdbc/latest/Cloudera-JDBC-Driver-for-Apache-Hive-Install-Guide.pdf) section on "Configuring Logging".
 
