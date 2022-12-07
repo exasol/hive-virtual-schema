@@ -97,7 +97,7 @@ The `CONNECTION` object stores all relevant information and files in its fields:
 
 ### Generating the CREATE CONNECTION Statement
 
-In order to simplify the creation of Kerberos `CONNECTION` objects, the [`create_kerberos_conn.py`](https://github.com/EXASOL/hadoop-etl-udfs/blob/master/tools/create_kerberos_conn.py) Python script has been provided. The script requires 5 arguments:
+In order to simplify the creation of Kerberos `CONNECTION` objects, the [`create_kerberos_conn.py`](https://github.com/exasol/virtual-schemas/blob/main/tools/create_kerberos_conn.py) Python script has been provided. The script requires 5 arguments:
 
 * `CONNECTION` name (arbitrary name for the new `CONNECTION`)
 * Kerberos principal for Hadoop (i.e., Hadoop user)
