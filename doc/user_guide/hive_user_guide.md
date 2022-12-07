@@ -152,7 +152,7 @@ udp_preference_limit = 1
 
 The `includedir` folders contain a file with a setting `[libdefaults]` setting `udp_preference_limit = 1`, two new categories `[capaths]` and `[plugins]` that were not in the original `krb5.conf` file. We add such settings into the copied `krb5.conf` file and use it to create the connection object.
 
-This is required since the Virtual Schema run in a sandboxed container that does not have an access to the host operating system's files.
+This is required since the Virtual Schema runs in a sandboxed container that does not have an access to the host operating system's files.
 
 Next, we add the JDBC connection URL to the `TO` part of the connection string.
 
@@ -180,7 +180,7 @@ IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
 
 #### Kerberos Authentication Type
 
-As you can see we are using `KrbAuthType=1`. This allows the Hive JDBC driver to check the `java.security.auth.login.config` system property for a JAAS configuration. If a JAAS configuration is specified, the driver uses that information to create a `LoginContext` and then uses the `Subject` associated with it. Exasol Virtual Schema creates `JAAS` configuration at the runtime using the information from the `IDENTIFIED BY` part of the connection object.
+As you can see we are using `KrbAuthType=1`. This allows the Hive JDBC driver to check the `java.security.auth.login.config` system property for a JAAS configuration. If a JAAS configuration is specified, the driver uses that information to create a `LoginContext` and then uses the `Subject` associated with it. Exasol Virtual Schema creates a `JAAS` configuration at runtime using the information from the `IDENTIFIED BY` part of the connection object.
 
 ### Creating the Connection
 
