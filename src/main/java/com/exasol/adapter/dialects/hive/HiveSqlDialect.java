@@ -142,8 +142,9 @@ public class HiveSqlDialect extends AbstractSqlDialect {
             return new HiveMetadataReader(this.connectionFactory.getConnection(), this.properties);
         } catch (final SQLException exception) {
             throw new RemoteMetadataReaderException(ExaError.messageBuilder("E-VS-HIVE-1")
-                    .message("Unable to create Hive remote metadata reader. Caused by: {{cause}}") //
-                    .unquotedParameter("cause", exception.getMessage()).toString(), exception);
+                    .message("Unable to create Hive remote metadata reader. Caused by: {{cause|u}}",
+                            exception.getMessage()) //
+                    .toString(), exception);
         }
     }
 
