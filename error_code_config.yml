@@ -1,5 +1,5 @@
 error-tags:
-  VS-HIVE:
+  VSHIVE:
     packages:
       - com.exasol.adapter.dialects.hive
     highest-index: 3
