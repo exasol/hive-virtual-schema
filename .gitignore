@@ -3,6 +3,10 @@
 # Eclipse and Maven
 .classpath
 .project
+**/.settings/org.eclipse.core.resources.prefs
+**/.settings/org.eclipse.jdt.apt.core.prefs
+**/.settings/org.eclipse.m2e.core.prefs
+**/.settings/org.sonarlint.eclipse.core.prefs
 # .settings : we need Eclipse settings for code formatter and clean-up rules
 target
 .cache
@@ -33,3 +37,5 @@ pom.xml.versionsBackup
 *.old
 *.md.html
 *.flattened-pom.xml
+/.apt_generated/
+/.apt_generated_tests/

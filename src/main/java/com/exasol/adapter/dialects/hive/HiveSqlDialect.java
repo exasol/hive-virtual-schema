@@ -18,6 +18,7 @@ import com.exasol.adapter.dialects.*;
 import com.exasol.adapter.dialects.rewriting.ImportIntoTemporaryTableQueryRewriter;
 import com.exasol.adapter.dialects.rewriting.SqlGenerationContext;
 import com.exasol.adapter.jdbc.*;
+import com.exasol.adapter.properties.CastNumberToDecimalProperty;
 import com.exasol.adapter.sql.ScalarFunction;
 import com.exasol.errorreporting.ExaError;
 
@@ -58,7 +59,8 @@ public class HiveSqlDialect extends AbstractSqlDialect {
      */
     public HiveSqlDialect(final ConnectionFactory connectionFactory, final AdapterProperties properties) {
         super(connectionFactory, properties,
-                Set.of(CATALOG_NAME_PROPERTY, SCHEMA_NAME_PROPERTY, HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY));
+                Set.of(CATALOG_NAME_PROPERTY, SCHEMA_NAME_PROPERTY, HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY),
+                List.of(CastNumberToDecimalProperty.validator(HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY)));
     }
 
     @Override
@@ -146,12 +148,6 @@ public class HiveSqlDialect extends AbstractSqlDialect {
                             exception.getMessage()) //
                     .toString(), exception);
         }
-    }
-
-    @Override
-    public void validateProperties() throws PropertyValidationException {
-        super.validateProperties();
-        validateCastNumberToDecimalProperty(HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY);
     }
 
     @Override

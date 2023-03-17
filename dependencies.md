@@ -28,7 +28,7 @@
 | ------------------------------------------------------- | ---------------------------------------------- |
 | [SonarQube Scanner for Maven][20]                       | [GNU LGPL 3][21]                               |
 | [Apache Maven Compiler Plugin][22]                      | [Apache License, Version 2.0][23]              |
-| [Apache Maven Enforcer Plugin][24]                      | [Apache License, Version 2.0][23]              |
+| [Apache Maven Enforcer Plugin][24]                      | [Apache-2.0][23]                               |
 | [Maven Flatten Plugin][25]                              | [Apache Software Licenese][23]                 |
 | [org.sonatype.ossindex.maven:ossindex-maven-plugin][26] | [ASL2][27]                                     |
 | [Maven Surefire Plugin][28]                             | [Apache License, Version 2.0][23]              |
@@ -76,7 +76,7 @@
 [26]: https://sonatype.github.io/ossindex-maven/maven-plugin/
 [27]: http://www.apache.org/licenses/LICENSE-2.0.txt
 [28]: https://maven.apache.org/surefire/maven-surefire-plugin/
-[29]: https://www.mojohaus.org/versions-maven-plugin/
+[29]: https://www.mojohaus.org/versions/versions-maven-plugin/
 [30]: https://maven.apache.org/plugins/maven-assembly-plugin/
 [31]: https://maven.apache.org/plugins/maven-jar-plugin/
 [32]: https://github.com/exasol/project-keeper/
