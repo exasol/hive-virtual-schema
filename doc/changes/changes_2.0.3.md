@@ -4,11 +4,12 @@ Code name: Dependency Upgrade
 
 ## Summary
 
-This release updates dependencies to remove references to discontinued maven repository `maven.exasol.com`.
+This release renames error codes from `VS-HIVE` to `VSHIVE` and updates dependencies to remove references to discontinued maven repository `maven.exasol.com`.
 
 ## Changes
 
 * #35: Updated dependencies
+* #29: Renamed error codes
 
 ## Dependency Updates
 
