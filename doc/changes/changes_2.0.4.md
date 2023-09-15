@@ -10,7 +10,7 @@ This release updates Hive virtual scheme connector to the latest
 ## Features
 
 * #41: Update to the latest `virtual-schema-common` libs
-* #43: Update to the latest `virtual-schema-common-jdbc`, update test deps to fix vulnerability (CVE-2023-42503)
+* #44: Update to the latest `virtual-schema-common-jdbc`, update test deps to fix vulnerability (CVE-2023-42503)
 
 ## Dependency Updates
 
