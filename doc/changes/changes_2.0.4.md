@@ -1,6 +1,6 @@
-# Virtual Schema for Hive 2.0.4, released 2023-??-??
+# Virtual Schema for Hive 2.0.4, released 2023-09-15
 
-Code name:
+Code name: Update to the latest `virtual-schema-common-jdbc`
 
 ## Summary
 
@@ -10,6 +10,7 @@ This release updates Hive virtual scheme connector to the latest
 ## Features
 
 * #41: Update to the latest `virtual-schema-common` libs
+* #43: Update to the latest `virtual-schema-common-jdbc`, update test deps to fix vulnerabilities
 
 ## Dependency Updates
 
