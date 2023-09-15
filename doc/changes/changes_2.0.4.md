@@ -1,22 +1,28 @@
-# Virtual Schema for Hive 2.0.4, released 2023-??-??
+# Virtual Schema for Hive 2.0.4, released 2023-09-15
 
-Code name:
+Code name: Update to the latest `virtual-schema-common-jdbc`
 
 ## Summary
+
+This release updates Hive virtual scheme connector to the latest 
+`virtual-schema-common-jdbc` which fixes JDBC connection issues.
 
 ## Features
 
 * #41: Update to the latest `virtual-schema-common` libs
+* #43: Update to the latest `virtual-schema-common-jdbc`, update test deps to fix vulnerability (CVE-2023-42503)
 
 ## Dependency Updates
 
 ### Compile Dependency Updates
 
-* Updated `com.exasol:virtual-schema-common-jdbc:10.5.0` to `11.0.1`
+* Updated `com.exasol:virtual-schema-common-jdbc:10.5.0` to `11.0.2`
 
 ### Test Dependency Updates
 
-* Updated `com.exasol:virtual-schema-common-jdbc:10.5.0` to `11.0.1`
+* Updated `com.exasol:exasol-testcontainers:6.5.1` to `6.6.1`
+* Updated `com.exasol:virtual-schema-common-jdbc:10.5.0` to `11.0.2`
+* Added `org.apache.commons:commons-compress:1.24.0`
 
 ### Plugin Dependency Updates
 
