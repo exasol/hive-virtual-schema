@@ -14,7 +14,7 @@
         <relativePath>pk_generated_parent.pom</relativePath>
     </parent>
     <properties>
-        <vscjdbc.version>11.0.1</vscjdbc.version>
+        <vscjdbc.version>11.0.2</vscjdbc.version>
     </properties>
     <dependencies>
         <dependency>
@@ -63,13 +63,19 @@
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>exasol-testcontainers</artifactId>
-            <version>6.5.1</version>
+            <version>6.6.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>1.17.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.24.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
