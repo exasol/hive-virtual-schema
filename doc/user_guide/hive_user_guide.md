@@ -18,12 +18,12 @@ Now register the driver in EXAOperation:
 
 You need to specify the following settings when adding the JDBC driver via EXAOperation.
 
-| Parameter | Value                                               |
-|-----------|-----------------------------------------------------|
-| Name      | `HIVE`                                              |
-| Main      | `com.cloudera.hive.jdbc41.HS2Driver`                |
-| Prefix    | `jdbc:hive2:`                                       |
-| Files     | `HiveJDBC41.jar`                                    |
+| Parameter | Value                                             |
+|-----------|---------------------------------------------------|
+| Name      | `HIVE`                                            |
+| Main      | `com.cloudera.hive.jdbc.HS2Driver`                |
+| Prefix    | `jdbc:hive2:`                                     |
+| Files     | `HiveJDBC42.jar`                                  |
 
 ## Uploading the JDBC Driver to EXAOperation
 
@@ -51,10 +51,11 @@ CREATE SCHEMA ADAPTER;
 The SQL statement below creates the adapter script, defines the Java class that serves as entry point and tells the UDF framework where to find the libraries (JAR files) for Virtual Schema and database driver.
 
 ```sql
+--/
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.4.jar;
-  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.5.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC42.jar;
 /
 ```
 
@@ -64,9 +65,9 @@ Define the connection to Hive as shown below.
 
 ```sql
 CREATE OR REPLACE CONNECTION HIVE_CONNECTION 
-TO 'jdbc:hive2://<Hive host>:<port>' 
-USER '<user>' 
-IDENTIFIED BY '<password>';
+  TO 'jdbc:hive2://<Hive host>:<port>' 
+  USER '<user>' 
+  IDENTIFIED BY '<password>';
 ```
 
 ## Creating a Virtual Schema
@@ -75,10 +76,10 @@ Below you see how a Hive Virtual Schema is created. Please note that you have to
 
 ```sql
 CREATE VIRTUAL SCHEMA <virtual schema name> 
-    USING ADAPTER.JDBC_ADAPTER 
-    WITH
-    CONNECTION_NAME = 'HIVE_CONNECTION'
-    SCHEMA_NAME     = '<schema name>';
+  USING ADAPTER.JDBC_ADAPTER 
+  WITH
+  CONNECTION_NAME = 'HIVE_CONNECTION'
+  SCHEMA_NAME     = '<schema name>';
 ```
 
 ### Connecting To a Kerberos Secured Hadoop:
@@ -114,7 +115,10 @@ python tools/create_kerberos_conn.py krb_conn krbuser@EXAMPLE.COM /etc/krb5.conf
 This outputs a create connection statement:
 
 ```sql
-CREATE CONNECTION krb_conn TO '' USER 'krbuser@EXAMPLE.COM' IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
+CREATE CONNECTION krb_conn
+  TO ''
+  USER 'krbuser@EXAMPLE.COM'
+  IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg==';
 ```
 
 #### Using Correct `krb5.conf` Configuration File
@@ -162,9 +166,9 @@ Add the JDBC connection URL to the `TO` part of the connection string:
 
 ```sql
 CREATE OR REPLACE CONNECTION krb_conn
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive'
-USER 'krbuser@EXAMPLE.COM'
-IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
+  TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive'
+  USER 'krbuser@EXAMPLE.COM'
+  IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg==';
 ```
 
 #### Using HTTP protocol with Kerberos
@@ -173,9 +177,9 @@ Similar to the Thrift protocol, update the `TO` part of the connection string wi
 
 ```sql
 CREATE OR REPLACE CONNECTION krb_conn
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice'
-USER 'krbuser@EXAMPLE.COM'
-IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
+  TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice'
+  USER 'krbuser@EXAMPLE.COM'
+  IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg==';
 ```
 
 #### Kerberos Authentication Type
@@ -192,10 +196,10 @@ You can now create a virtual schema using the Kerberos connection created before
 
 ```sql
 CREATE VIRTUAL SCHEMA <virtual schema name> 
-   USING ADAPTER.JDBC_ADAPTER
-   WITH
-   CONNECTION_NAME = 'KRB_CONN'
-   SCHEMA_NAME     = '<schema name>';
+  USING ADAPTER.JDBC_ADAPTER
+  WITH
+  CONNECTION_NAME = 'KRB_CONN'
+  SCHEMA_NAME     = '<schema name>';
 ```
 
 ### Enabling Logging
@@ -353,12 +357,13 @@ One possible solution to this problem is to disable Kerberos principal name alia
 
 In Virtual Schema adapter:
 
-```
+```sql
+--/
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %jvmoption -Dsun.security.krb5.disableReferrals=true;
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.4.jar;
-  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.5.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC42.jar;
 /
 ```
 
@@ -416,19 +421,7 @@ In the following matrix you find combinations of JDBC driver and dialect version
 The dialect was tested with the Cloudera Hive JDBC driver available on the [Cloudera downloads page](http://www.cloudera.com/downloads). 
 The driver is also available directly from [Simba technologies](http://www.simba.com/), who developed the driver.
 
-Virtual Schema Version| Hive Version | Driver Name | Driver Version 
-----------------------|--------------|-------------|-----------------
- 4.0.3                | 2.3.2        | HiveJDBC    | 4.1
-
-## Executing Disabled Integration Tests
-
-The integration tests for this repository are disabled, but it is possible to execute them locally. 	
-The reason for the tests being disabled is we can only deliver drivers where the license allows redistribution.
-
-### Starting Disabled Integration Test Locally
-
-1. Download the [Hive JDBC driver `HiveJDBC41.jar`](https://www.cloudera.com/downloads/connectors/hive/jdbc/2-5-4.html)
-2. Temporarily put the driver into `src/test/resources/integration/driver/hive` directory.
-3. Make sure that the file's name is `HiveJDBC41.jar`.
-4. Run the tests from an IDE or temporarily comment out the `skip` property of `maven-failsafe-plugin` and execute `mvn verify` command.
-5. **Do not upload the driver to the GitHub repository**.
+Virtual Schema Version| Hive Version | Driver Name    | Driver Version 
+----------------------|--------------|----------------|-----------------
+ 4.0.3                | 2.3.2        | HiveJDBC       | 4.1
+ 2.0.5                | 2.3.2        | HiveJDBC42.jar | 2.6.23
