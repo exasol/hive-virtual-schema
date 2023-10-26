@@ -37,11 +37,9 @@ Find all the documentation in the [Virtual Schemas project][vs-doc].
 
 ## Information for Developers
 
+* [Developer Guide](doc/developer_guide.md) 
 * [Virtual Schema API Documentation][vs-api]
 
-[hive-dialect-doc]: doc/user_guide/hive_user_guide.md
-
-[vs-api]: https://github.com/exasol/virtual-schema-common-java/blob/master/doc/development/api/virtual_schema_api.md
 [virtual-schemas-user-guide]: https://docs.exasol.com/database_concepts/virtual_schemas.htm
 [virtual-schemas]: https://github.com/exasol/virtual-schemas
 [vs-api]: https://github.com/exasol/virtual-schema-common-java/blob/master/doc/development/api/virtual_schema_api.md
