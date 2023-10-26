@@ -18,6 +18,7 @@ Code name:
 * Updated `com.exasol:test-db-builder-java:3.4.2` to `3.5.1`
 * Updated `org.junit.jupiter:junit-jupiter:5.9.2` to `5.10.0`
 * Updated `org.mockito:mockito-junit-jupiter:5.2.0` to `5.6.0`
+* Added `org.slf4j:slf4j-jdk14:2.0.9`
 * Updated `org.testcontainers:junit-jupiter:1.17.6` to `1.19.1`
 
 ### Plugin Dependency Updates
