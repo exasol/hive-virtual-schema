@@ -39,7 +39,7 @@ import com.exasol.dbbuilder.dialects.exasol.*;
 import com.exasol.matcher.TypeMatchMode;
 
 /**
- * How to run `HiveSqlDialectIT`: See the documentation <a href="doc/user_guide/hive_user_guide.md"</a>.
+ * How to run `HiveSqlDialectIT`: See the documentation <a href="doc/developer_guide.md"</a>.
  */
 @Tag("integration")
 @Testcontainers
