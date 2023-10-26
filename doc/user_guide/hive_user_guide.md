@@ -421,6 +421,7 @@ In the following matrix you find combinations of JDBC driver and dialect version
 The dialect was tested with the Cloudera Hive JDBC driver available on the [Cloudera downloads page](http://www.cloudera.com/downloads). 
 The driver is also available directly from [Simba technologies](http://www.simba.com/), who developed the driver.
 
-Virtual Schema Version| Hive Version | Driver Name | Driver Version 
-----------------------|--------------|-------------|-----------------
- 4.0.3                | 2.3.2        | HiveJDBC    | 4.1
+Virtual Schema Version| Hive Version | Driver Name    | Driver Version 
+----------------------|--------------|----------------|-----------------
+ 4.0.3                | 2.3.2        | HiveJDBC       | 4.1
+ 2.0.5                | 2.3.2        | HiveJDBC42.jar | 2.6.23
