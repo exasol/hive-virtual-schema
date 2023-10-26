@@ -61,11 +61,10 @@ class HiveSqlDialectIT {
     @Container
     public static DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
             new File(HIVE_DOCKER_COMPOSE_YAML)) //
-                    .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT, Wait.forListeningPort());
+            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT, Wait.forListeningPort());
     @Container
-    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>(
-            EXASOL_DOCKER_IMAGE_REFERENCE) //
-                    .withLogConsumer(new Slf4jLogConsumer(LOGGER)).withReuse(true); //
+    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>()
+            .withLogConsumer(new Slf4jLogConsumer(LOGGER)).withReuse(true); //
     private static Connection exasolConnection;
     private static Statement statementExasol;
     private static ExasolObjectFactory exasolFactory;
@@ -75,9 +74,9 @@ class HiveSqlDialectIT {
     private static Connection hiveConnection;
 
     @BeforeAll
-    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException,
-            ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException,
-            NoSuchMethodException, InvocationTargetException, FileNotFoundException {
+    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, ClassNotFoundException,
+            IllegalAccessException, InstantiationException, MalformedURLException, NoSuchMethodException,
+            InvocationTargetException, FileNotFoundException {
         uploadDriverToBucket();
         uploadVsJarToBucket(EXASOL.getDefaultBucket());
         exasolConnection = EXASOL.createConnection("");
@@ -133,8 +132,9 @@ class HiveSqlDialectIT {
         return driver.connect("jdbc:hive2://localhost:" + HIVE_EXPOSED_PORT + "/" + SCHEMA_HIVE, new Properties());
     }
 
-    private static Driver loadJDBCDriver() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        final File file = new File("src/test/resources/integration/driver/hive/HiveJDBC41.jar");
+    private static Driver loadJDBCDriver() throws MalformedURLException, ClassNotFoundException, InstantiationException,
+            IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        final File file = new File("src/test/resources/integration/driver/hive/HiveJDBC42.jar");
         final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { file.toURI().toURL() },
                 HiveSqlDialectIT.class.getClassLoader());
         final Class<?> driverClass = urlClassLoader.loadClass("com.cloudera.hive.jdbc41.HS2Driver");

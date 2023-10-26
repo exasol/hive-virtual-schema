@@ -18,12 +18,12 @@ Now register the driver in EXAOperation:
 
 You need to specify the following settings when adding the JDBC driver via EXAOperation.
 
-| Parameter | Value                                               |
-|-----------|-----------------------------------------------------|
-| Name      | `HIVE`                                              |
-| Main      | `com.cloudera.hive.jdbc41.HS2Driver`                |
-| Prefix    | `jdbc:hive2:`                                       |
-| Files     | `HiveJDBC41.jar`                                    |
+| Parameter | Value                                             |
+|-----------|---------------------------------------------------|
+| Name      | `HIVE`                                            |
+| Main      | `com.cloudera.hive.jdbc.HS2Driver`                |
+| Prefix    | `jdbc:hive2:`                                     |
+| Files     | `HiveJDBC42.jar`                                  |
 
 ## Uploading the JDBC Driver to EXAOperation
 
@@ -54,8 +54,8 @@ The SQL statement below creates the adapter script, defines the Java class that 
 --/
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.4.jar;
-  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.5.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC42.jar;
 /
 ```
 
@@ -357,12 +357,13 @@ One possible solution to this problem is to disable Kerberos principal name alia
 
 In Virtual Schema adapter:
 
-```
+```sql
+--/
 CREATE OR REPLACE JAVA ADAPTER SCRIPT ADAPTER.JDBC_ADAPTER AS
   %jvmoption -Dsun.security.krb5.disableReferrals=true;
   %scriptclass com.exasol.adapter.RequestDispatcher;
-  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.4.jar;
-  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC41.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/virtual-schema-dist-11.0.2-hive-2.0.5.jar;
+  %jar /buckets/<BFS service>/<bucket>/jars/HiveJDBC42.jar;
 /
 ```
 
