@@ -137,7 +137,7 @@ class HiveSqlDialectIT {
         final File file = new File("src/test/resources/integration/driver/hive/HiveJDBC42.jar");
         final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { file.toURI().toURL() },
                 HiveSqlDialectIT.class.getClassLoader());
-        final Class<?> driverClass = urlClassLoader.loadClass("com.cloudera.hive.jdbc41.HS2Driver");
+        final Class<?> driverClass = urlClassLoader.loadClass("com.cloudera.hive.jdbc.HS2Driver");
         return (Driver) driverClass.getDeclaredConstructor().newInstance();
     }
 
