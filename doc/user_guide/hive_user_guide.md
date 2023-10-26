@@ -65,9 +65,9 @@ Define the connection to Hive as shown below.
 
 ```sql
 CREATE OR REPLACE CONNECTION HIVE_CONNECTION 
-TO 'jdbc:hive2://<Hive host>:<port>' 
-USER '<user>' 
-IDENTIFIED BY '<password>';
+  TO 'jdbc:hive2://<Hive host>:<port>' 
+  USER '<user>' 
+  IDENTIFIED BY '<password>';
 ```
 
 ## Creating a Virtual Schema
@@ -76,10 +76,10 @@ Below you see how a Hive Virtual Schema is created. Please note that you have to
 
 ```sql
 CREATE VIRTUAL SCHEMA <virtual schema name> 
-    USING ADAPTER.JDBC_ADAPTER 
-    WITH
-    CONNECTION_NAME = 'HIVE_CONNECTION'
-    SCHEMA_NAME     = '<schema name>';
+  USING ADAPTER.JDBC_ADAPTER 
+  WITH
+  CONNECTION_NAME = 'HIVE_CONNECTION'
+  SCHEMA_NAME     = '<schema name>';
 ```
 
 ### Connecting To a Kerberos Secured Hadoop:
@@ -115,7 +115,10 @@ python tools/create_kerberos_conn.py krb_conn krbuser@EXAMPLE.COM /etc/krb5.conf
 This outputs a create connection statement:
 
 ```sql
-CREATE CONNECTION krb_conn TO '' USER 'krbuser@EXAMPLE.COM' IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
+CREATE CONNECTION krb_conn
+  TO ''
+  USER 'krbuser@EXAMPLE.COM'
+  IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg==';
 ```
 
 #### Using Correct `krb5.conf` Configuration File
@@ -163,9 +166,9 @@ Add the JDBC connection URL to the `TO` part of the connection string:
 
 ```sql
 CREATE OR REPLACE CONNECTION krb_conn
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive'
-USER 'krbuser@EXAMPLE.COM'
-IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
+  TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive'
+  USER 'krbuser@EXAMPLE.COM'
+  IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg==';
 ```
 
 #### Using HTTP protocol with Kerberos
@@ -174,9 +177,9 @@ Similar to the Thrift protocol, update the `TO` part of the connection string wi
 
 ```sql
 CREATE OR REPLACE CONNECTION krb_conn
-TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice'
-USER 'krbuser@EXAMPLE.COM'
-IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg=='
+  TO 'jdbc:hive2://<Hive host>:<port>;AuthMech=1;KrbAuthType=1;KrbRealm=EXAMPLE.COM;KrbHostFQDN=_HOST;KrbServiceName=hive;transportMode=http;httpPath=cliservice'
+  USER 'krbuser@EXAMPLE.COM'
+  IDENTIFIED BY 'ExaAuthType=Kerberos;enp6Cg==;YWFhCg==';
 ```
 
 #### Kerberos Authentication Type
@@ -193,10 +196,10 @@ You can now create a virtual schema using the Kerberos connection created before
 
 ```sql
 CREATE VIRTUAL SCHEMA <virtual schema name> 
-   USING ADAPTER.JDBC_ADAPTER
-   WITH
-   CONNECTION_NAME = 'KRB_CONN'
-   SCHEMA_NAME     = '<schema name>';
+  USING ADAPTER.JDBC_ADAPTER
+  WITH
+  CONNECTION_NAME = 'KRB_CONN'
+  SCHEMA_NAME     = '<schema name>';
 ```
 
 ### Enabling Logging
