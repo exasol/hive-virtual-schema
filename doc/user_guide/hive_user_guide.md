@@ -2,35 +2,33 @@
 
 [The Apache Hive](https://hive.apache.org/) data warehouse software facilitates reading, writing, and managing datasets residing in distributed storage using SQL.
 
-## Registering the JDBC Driver in EXAOperation
+## Registering the JDBC Driver for ExaLoader
 
 First download the [Hive Cloudera JDBC driver](https://www.cloudera.com/downloads/connectors/hive/jdbc/).
 
-Now register the driver in EXAOperation:
+In order to enable the ExaLoader to fetch data from the external database you must register the driver for ExaLoader as described in the [Installation procedure for JDBC drivers](https://github.com/exasol/docker-db/#installing-custom-jdbc-drivers).
+1. ExaLoader expects the driver in BucketFS folder `default/drivers/jdbc`.
 
-1. Click "Software"
-1. Switch to tab "JDBC Drivers"
-1. Click "Browse..."
-1. Select JDBC driver file
-1. Click "Upload"
-1. Click "Add"
-1. In dialog "Add EXACluster JDBC driver" configure the JDBC driver (see below)
+    If you uploaded the driver for UDF to a different folder, then you need to [upload](#uploading-the-jdbc-driver-to-exasol-bucketfs) the driver again.
+2. Additionally you need to create file `settings.cfg` and [upload](#uploading-the-jdbc-driver-to-exasol-bucketfs) it to the same folder in BucketFS:
 
-You need to specify the following settings when adding the JDBC driver via EXAOperation.
+    ```properties
+    DRIVERNAME=HIVE
+    JAR=HiveJDBC42.jar
+    DRIVERMAIN=com.cloudera.hive.jdbc.HS2Driver
+    PREFIX=jdbc:hive2:
+    FETCHSIZE=100000
+    INSERTSIZE=-1
+    NOSECURITY=YES
+    ```
+    Please ensure that the file contains a trailing newline.
 
-| Parameter | Value                                             |
-|-----------|---------------------------------------------------|
-| Name      | `HIVE`                                            |
-| Main      | `com.cloudera.hive.jdbc.HS2Driver`                |
-| Prefix    | `jdbc:hive2:`                                     |
-| Files     | `HiveJDBC42.jar`                                  |
+## Uploading the JDBC Driver to Exasol BucketFS
 
-## Uploading the JDBC Driver to EXAOperation
+1. Download the [Hive Cloudera JDBC driver](https://www.cloudera.com/downloads/connectors/hive/jdbc/).
+2. Upload the driver to BucketFS, see the [BucketFS documentation](https://docs.exasol.com/db/latest/administration/on-premise/bucketfs/accessfiles.htm) for details.
 
-1. [Create a bucket in BucketFS](https://docs.exasol.com/administration/on-premise/bucketfs/create_new_bucket_in_bucketfs_service.htm)
-1. Upload the driver to BucketFS
-
-This step is necessary since the UDF container the adapter runs in has no access to the JDBC drivers installed via EXAOperation but it can access BucketFS.
+    Hint: Put the driver into folder `default/drivers/jdbc/` to register it for [ExaLoader](#registering-the-jdbc-driver-for-exaloader), too.
 
 ### Difference Between Apache JDBC and Cloudera JDBC Drivers
 

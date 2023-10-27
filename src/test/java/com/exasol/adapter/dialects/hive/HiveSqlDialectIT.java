@@ -36,6 +36,7 @@ import com.exasol.bucketfs.BucketAccessException;
 import com.exasol.containers.ExasolContainer;
 import com.exasol.dbbuilder.dialects.DatabaseObject;
 import com.exasol.dbbuilder.dialects.exasol.*;
+import com.exasol.drivers.JdbcDriver;
 import com.exasol.matcher.TypeMatchMode;
 
 /**
@@ -718,12 +719,10 @@ class HiveSqlDialectIT {
     }
 
     private static void uploadDriverToBucket() throws BucketAccessException, TimeoutException, FileNotFoundException {
-        final Bucket bucket = EXASOL.getDefaultBucket();
-        final Path pathToSettingsFile = Path.of("src", "test", "resources", "integration", "driver", "hive",
-                JDBC_DRIVER_CONFIGURATION_FILE_NAME);
-        bucket.uploadFile(pathToSettingsFile, "drivers/jdbc/" + JDBC_DRIVER_CONFIGURATION_FILE_NAME);
         final Path driverPath = Path.of("src", "test", "resources", "integration", "driver", "hive", JDBC_DRIVER_NAME);
-        bucket.uploadFile(driverPath, "drivers/jdbc/" + JDBC_DRIVER_NAME);
+        final JdbcDriver jdbcDriver = JdbcDriver.builder("HIVE").mainClass("com.cloudera.hive.jdbc.HS2Driver")
+                .prefix("jdbc:hive2:").sourceFile(driverPath).enableSecurityManager(false).build();
+        EXASOL.getDriverManager().install(jdbcDriver);
     }
 
     private static void uploadVsJarToBucket(final Bucket bucket)
