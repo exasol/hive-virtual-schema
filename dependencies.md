@@ -54,7 +54,7 @@
 [6]: https://junit.org/junit5/
 [7]: https://www.eclipse.org/legal/epl-v20.html
 [8]: https://github.com/mockito/mockito
-[9]: https://github.com/mockito/mockito/blob/main/LICENSE
+[9]: https://opensource.org/licenses/MIT
 [10]: http://www.exasol.com
 [11]: https://repo1.maven.org/maven2/com/exasol/exasol-jdbc/7.1.20/exasol-jdbc-7.1.20-license.txt
 [12]: https://github.com/exasol/exasol-testcontainers/
