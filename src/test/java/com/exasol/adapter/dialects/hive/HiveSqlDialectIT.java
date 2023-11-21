@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
@@ -44,7 +42,6 @@ import com.exasol.matcher.TypeMatchMode;
 @Tag("integration")
 @Testcontainers
 class HiveSqlDialectIT {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlDialectIT.class);
     private static final String HIVE_DOCKER_COMPOSE_YAML = "src/test/resources/integration/driver/hive/docker-compose.yaml";
     private static final String HIVE_SERVICE_NAME = "hive-server_1";
     private static final int HIVE_EXPOSED_PORT = 10000;
