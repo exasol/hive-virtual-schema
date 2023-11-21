@@ -8,7 +8,7 @@ This release fixes vulnerability CVE-2023-4043 in test dependency `org.eclipse.p
 
 ## Security
 
-* #114: Fixed CVE-2023-4043 in test dependency `org.eclipse.parsson:parsson`
+* #48: Fixed CVE-2023-4043 in test dependency `org.eclipse.parsson:parsson`
 
 ## Documentation
 
