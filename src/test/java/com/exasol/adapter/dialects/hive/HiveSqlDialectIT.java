@@ -17,16 +17,14 @@ import java.math.BigDecimal;
 import java.net.*;
 import java.nio.file.Path;
 import java.sql.*;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -40,13 +38,13 @@ import com.exasol.drivers.JdbcDriver;
 import com.exasol.matcher.TypeMatchMode;
 
 /**
- * How to run `HiveSqlDialectIT`: See the documentation <a href="doc/developer_guide.md"</a>.
+ * How to run {@link HiveSqlDialectIT}: See the documentation in doc/developer_guide.md.
  */
 @Tag("integration")
 @Testcontainers
 class HiveSqlDialectIT {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlDialectIT.class);
-    private static final String HIVE_DOCKER_COMPOSE_YAML = "src/test/resources/integration/driver/hive/docker-compose.yaml";
+    private static final File HIVE_DOCKER_COMPOSE_YAML = new File(
+            "src/test/resources/integration/driver/hive/docker-compose.yaml");
     private static final String HIVE_SERVICE_NAME = "hive-server_1";
     private static final int HIVE_EXPOSED_PORT = 10000;
     private static final String JDBC_CONNECTION_NAME = "JDBC";
@@ -61,18 +59,18 @@ class HiveSqlDialectIT {
     private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
     @Container
     public static DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
-            new File(HIVE_DOCKER_COMPOSE_YAML)) //
-            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT, Wait.forListeningPort());
+            HIVE_DOCKER_COMPOSE_YAML) //
+            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
+                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
     @Container
-    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>()
-            .withLogConsumer(new Slf4jLogConsumer(LOGGER)).withReuse(true); //
+    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
     private static Connection exasolConnection;
     private static Statement statementExasol;
     private static ExasolObjectFactory exasolFactory;
     private static AdapterScript adapterScript;
     private static ConnectionDefinition connectionDefinition;
-    private VirtualSchema virtualSchema;
     private static Connection hiveConnection;
+    private VirtualSchema virtualSchema;
 
     @BeforeAll
     static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, ClassNotFoundException,
