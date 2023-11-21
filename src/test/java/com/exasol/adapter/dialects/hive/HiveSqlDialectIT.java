@@ -26,7 +26,6 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -40,7 +39,7 @@ import com.exasol.drivers.JdbcDriver;
 import com.exasol.matcher.TypeMatchMode;
 
 /**
- * How to run `HiveSqlDialectIT`: See the documentation <a href="doc/developer_guide.md"</a>.
+ * How to run {@link HiveSqlDialectIT}: See the documentation in doc/developer_guide.md.
  */
 @Tag("integration")
 @Testcontainers
@@ -64,15 +63,14 @@ class HiveSqlDialectIT {
             new File(HIVE_DOCKER_COMPOSE_YAML)) //
             .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT, Wait.forListeningPort());
     @Container
-    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>()
-            .withLogConsumer(new Slf4jLogConsumer(LOGGER)).withReuse(true); //
+    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
     private static Connection exasolConnection;
     private static Statement statementExasol;
     private static ExasolObjectFactory exasolFactory;
     private static AdapterScript adapterScript;
     private static ConnectionDefinition connectionDefinition;
-    private VirtualSchema virtualSchema;
     private static Connection hiveConnection;
+    private VirtualSchema virtualSchema;
 
     @BeforeAll
     static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, ClassNotFoundException,
