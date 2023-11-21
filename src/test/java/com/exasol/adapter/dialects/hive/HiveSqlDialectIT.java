@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.net.*;
 import java.nio.file.Path;
 import java.sql.*;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -42,7 +43,8 @@ import com.exasol.matcher.TypeMatchMode;
 @Tag("integration")
 @Testcontainers
 class HiveSqlDialectIT {
-    private static final String HIVE_DOCKER_COMPOSE_YAML = "src/test/resources/integration/driver/hive/docker-compose.yaml";
+    private static final File HIVE_DOCKER_COMPOSE_YAML = new File(
+            "src/test/resources/integration/driver/hive/docker-compose.yaml");
     private static final String HIVE_SERVICE_NAME = "hive-server_1";
     private static final int HIVE_EXPOSED_PORT = 10000;
     private static final String JDBC_CONNECTION_NAME = "JDBC";
@@ -57,8 +59,9 @@ class HiveSqlDialectIT {
     private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
     @Container
     public static DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
-            new File(HIVE_DOCKER_COMPOSE_YAML)) //
-            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT, Wait.forListeningPort());
+            HIVE_DOCKER_COMPOSE_YAML) //
+            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
+                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
     @Container
     private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
     private static Connection exasolConnection;
