@@ -4,6 +4,7 @@
 
 The integration tests for this repository are disabled, but it is possible to execute them locally. 	
 The reason for the tests being disabled is we can only deliver drivers where the license allows redistribution.
+See the [user guide](user_guide/hive_user_guide.md#difference-between-apache-jdbc-and-cloudera-jdbc-drivers) why we can't use the Apache Hive JDBC driver.
 
 ### Starting Disabled Integration Test Locally
 
