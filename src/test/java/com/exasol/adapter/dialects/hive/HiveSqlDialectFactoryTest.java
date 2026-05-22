@@ -28,4 +28,14 @@ class HiveSqlDialectFactoryTest {
         assertThat(this.factory.createSqlDialect(JDBCAdapterContext.builder().properties(AdapterProperties.emptyProperties()).build()),
                 instanceOf(HiveSqlDialect.class));
     }
+
+    @Test
+    void testGetSqlDialectVersion() {
+        assertThat(this.factory.getSqlDialectVersion(), equalTo("UNKNOWN"));
+    }
+
+    @Test
+    void testGetAdapterProjectShortTag() {
+        assertThat(this.factory.getAdapterProjectShortTag(), equalTo("VSHIVE"));
+    }
 }
