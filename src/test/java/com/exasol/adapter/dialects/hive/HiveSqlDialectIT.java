@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -59,10 +59,9 @@ class HiveSqlDialectIT {
     private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
     @SuppressWarnings("resource") // Will be closed @Container
     @Container
-    public static final DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
-            HIVE_DOCKER_COMPOSE_YAML) //
-                    .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
-                            Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
+    public static final ComposeContainer HIVE = new ComposeContainer(HIVE_DOCKER_COMPOSE_YAML)
+            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
+                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
     @SuppressWarnings("resource") // Will be closed @Container
     @Container
     private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
