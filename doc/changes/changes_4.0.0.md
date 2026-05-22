@@ -30,7 +30,7 @@ Starting with this release, this Virtual Schema no longer supports Exasol 7.1. T
 * Updated `com.exasol:virtual-schema-common-jdbc:12.0.0` to `14.0.2`
 * Updated `org.junit.jupiter:junit-jupiter-params:5.13.2` to `5.14.4`
 * Updated `org.mockito:mockito-junit-jupiter:5.18.0` to `5.23.0`
-* Updated `org.slf4j:slf4j-jdk14:2.0.17` to `2.0.18`
+* Updated `org.slf4j:slf4j-jdk14:2.0.17` to `1.7.36`
 * Removed `org.testcontainers:junit-jupiter:1.21.3`
 * Added `org.testcontainers:testcontainers-junit-jupiter:2.0.5`
 
