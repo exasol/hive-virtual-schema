@@ -29,7 +29,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.exasol.bucketfs.Bucket;
 import com.exasol.bucketfs.BucketAccessException;
 import com.exasol.containers.ExasolContainer;
-import com.exasol.dbbuilder.dialects.DatabaseObject;
 import com.exasol.dbbuilder.dialects.exasol.*;
 import com.exasol.drivers.JdbcDriver;
 import com.exasol.matcher.TypeMatchMode;
@@ -48,8 +47,7 @@ class HiveSqlDialectIT {
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC = "VIRTUAL_SCHEMA_HIVE_JDBC";
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL = "VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL";
     private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
-    @SuppressWarnings("resource") // Will be closed in afterAll() method
-    public static final HiveContainerFixture HIVE = HiveContainerFixture.start();
+    private static final HiveContainerFixture HIVE = HiveContainerFixture.start();
     @SuppressWarnings("resource") // Will be closed @Container
     @Container
     private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>("2026.1.0").withReuse(true); //
@@ -86,12 +84,10 @@ class HiveSqlDialectIT {
                 .build();
     }
 
-    @AfterAll
-    static void afterAll() throws SQLException {
-        exasolConnection.close();
-        statementExasol.close();
-        hiveConnection.close();
-        HIVE.close();
+    @BeforeEach
+    void logTestExecution(final TestInfo testInfo) {
+        LOGGER.info(() -> "Executing " + testInfo.getTestClass().map(Class::getSimpleName).orElse("unknown class")
+                + "." + testInfo.getTestMethod().map(Member::getName).orElse("unknown method"));
     }
 
     @AfterEach
@@ -99,22 +95,16 @@ class HiveSqlDialectIT {
         try (final Statement statementHive = hiveConnection.createStatement()) {
             statementHive.execute("DROP TABLE IF EXISTS " + HIVE_SOURCE_TABLE);
         }
-        dropAll(this.virtualSchema);
+        this.virtualSchema.drop();
         this.virtualSchema = null;
     }
 
-    private static void dropAll(final DatabaseObject... databaseObjects) {
-        for (final DatabaseObject databaseObject : databaseObjects) {
-            if (databaseObject != null) {
-                databaseObject.drop();
-            }
-        }
-    }
-
-    @BeforeEach
-    void logTestExecution(final TestInfo testInfo) {
-        LOGGER.info(() -> "Executing " + testInfo.getTestClass().map(Class::getSimpleName).orElse("unknown class")
-                + "." + testInfo.getTestMethod().map(Member::getName).orElse("unknown method"));
+    @AfterAll
+    static void afterAll() throws SQLException {
+        exasolConnection.close();
+        statementExasol.close();
+        hiveConnection.close();
+        HIVE.close();
     }
 
     private static void createTableHiveSimple(final Statement statementHive) throws SQLException {
