@@ -316,21 +316,21 @@ class HiveSqlDialectIT {
                 + "COLUMN_NUM_SCALE DECIMAL(18, 0), " //
                 + "COLUMN_DEFAULT VARCHAR(2000))");
         statementExasol.execute("INSERT INTO " + expectedSchemaQualifiedTableName + " VALUES " //
-                + "('ARRAYCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
+                + "('ARRAYCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
                 + "('BIGINTEGER', 'DECIMAL(19,0)', 19, 19, 0, NULL), " //
                 + "('BOOLCOLUMN', 'BOOLEAN', 1, NULL, NULL, NULL), " //
-                + "('CHARCOLUMN', 'CHAR(1) ASCII', 1, NULL, NULL, NULL), " //
+                + "('CHARCOLUMN', 'CHAR(1) UTF8', 1, NULL, NULL, NULL), " //
                 + "('DECIMALCOL', 'DECIMAL(10,0)', 10, 10, 0, NULL), " //
                 + "('DOUBLECOL', 'DOUBLE', 64, NULL, NULL, NULL), " //
                 + "('FLOATCOL', 'DOUBLE', 64, NULL, NULL, NULL), " //
                 + "('INTCOL', 'DECIMAL(10,0)', 10, 10, 0, NULL), " //
-                + "('MAPCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
+                + "('MAPCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
                 + "('SMALLINTEGER', 'DECIMAL(5,0)', 5, 5, 0, NULL), " //
-                + "('STRINGCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
-                + "('STRUCTCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
-                + "('TIMESTAMPCOL', 'TIMESTAMP', 29, NULL, NULL, NULL), " //
+                + "('STRINGCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
+                + "('STRUCTCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
+                + "('TIMESTAMPCOL', 'TIMESTAMP(9)', 29, 9, NULL, NULL), " //
                 + "('TINYINTEGER', 'DECIMAL(3,0)', 3, 3, 0, NULL), " //
-                + "('VARCHARCOL', 'VARCHAR(10) ASCII', 10, NULL, NULL, NULL), " //
+                + "('VARCHARCOL', 'VARCHAR(10) UTF8', 10, NULL, NULL, NULL), " //
                 + "('BINARYCOL', 'VARCHAR(2000000) UTF8', 2000000, NULL, NULL, NULL), " //
                 + "('DATECOL', 'DATE', 10, NULL, NULL, NULL) " //
         );
