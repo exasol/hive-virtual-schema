@@ -12,12 +12,12 @@ import static com.exasol.adapter.dialects.hive.HiveProperties.HIVE_CAST_NUMBER_T
 import java.sql.SQLException;
 import java.util.*;
 
-import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.capabilities.Capabilities;
 import com.exasol.adapter.dialects.*;
 import com.exasol.adapter.dialects.rewriting.ImportIntoTemporaryTableQueryRewriter;
 import com.exasol.adapter.dialects.rewriting.SqlGenerationContext;
-import com.exasol.adapter.jdbc.*;
+import com.exasol.adapter.jdbc.RemoteMetadataReader;
+import com.exasol.adapter.jdbc.RemoteMetadataReaderException;
 import com.exasol.adapter.properties.CastNumberToDecimalProperty;
 import com.exasol.adapter.sql.ScalarFunction;
 import com.exasol.errorreporting.ExaError;
@@ -54,11 +54,10 @@ public class HiveSqlDialect extends AbstractSqlDialect {
     /**
      * Create a new instance of the {@link HiveSqlDialect}.
      *
-     * @param connectionFactory factory for the JDBC connection to the remoted data source
-     * @param properties        user-defined adapter properties
+     * @param context context of the JDBC adapter
      */
-    public HiveSqlDialect(final ConnectionFactory connectionFactory, final AdapterProperties properties) {
-        super(connectionFactory, properties,
+    public HiveSqlDialect(final JDBCAdapterContext context) {
+        super(context,
                 Set.of(CATALOG_NAME_PROPERTY, SCHEMA_NAME_PROPERTY, HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY),
                 List.of(CastNumberToDecimalProperty.validator(HIVE_CAST_NUMBER_TO_DECIMAL_PROPERTY)));
     }
@@ -141,7 +140,7 @@ public class HiveSqlDialect extends AbstractSqlDialect {
     @Override
     protected RemoteMetadataReader createRemoteMetadataReader() {
         try {
-            return new HiveMetadataReader(this.connectionFactory.getConnection(), this.properties);
+            return new HiveMetadataReader(this.connectionFactory.getConnection(), this.properties, this.exaMetadata);
         } catch (final SQLException exception) {
             throw new RemoteMetadataReaderException(ExaError.messageBuilder("E-VSHIVE-1")
                     .message("Unable to create Hive remote metadata reader. Caused by: {{cause|u}}",

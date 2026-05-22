@@ -24,6 +24,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.capabilities.Capabilities;
+import com.exasol.adapter.dialects.JDBCAdapterContext;
 import com.exasol.adapter.dialects.SqlDialect;
 import com.exasol.adapter.properties.PropertyValidationException;
 
@@ -33,8 +34,12 @@ class HiveSqlDialectTest {
 
     @BeforeEach
     void beforeEach() {
-        this.dialect = new HiveSqlDialect(null, AdapterProperties.emptyProperties());
+        this.dialect = testee(AdapterProperties.emptyProperties());
         this.rawProperties = new HashMap<>();
+    }
+
+    private HiveSqlDialect testee(final AdapterProperties emptyProperties) {
+        return new HiveSqlDialect(JDBCAdapterContext.builder().properties(emptyProperties).build());
     }
 
     @Test
@@ -69,7 +74,7 @@ class HiveSqlDialectTest {
         setMandatoryProperties();
         this.rawProperties.put(CATALOG_NAME_PROPERTY, "MY_CATALOG");
         final AdapterProperties adapterProperties = new AdapterProperties(this.rawProperties);
-        final SqlDialect sqlDialect = new HiveSqlDialect(null, adapterProperties);
+        final SqlDialect sqlDialect = testee(adapterProperties);
         sqlDialect.validateProperties();
     }
 
@@ -78,7 +83,7 @@ class HiveSqlDialectTest {
         setMandatoryProperties();
         this.rawProperties.put(SCHEMA_NAME_PROPERTY, "MY_SCHEMA");
         final AdapterProperties adapterProperties = new AdapterProperties(this.rawProperties);
-        final SqlDialect sqlDialect = new HiveSqlDialect(null, adapterProperties);
+        final SqlDialect sqlDialect = testee(adapterProperties);
         sqlDialect.validateProperties();
     }
 

@@ -16,11 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.exasol.adapter.AdapterException;
 import com.exasol.adapter.AdapterProperties;
-import com.exasol.adapter.dialects.SqlDialect;
-import com.exasol.adapter.dialects.SqlDialectFactory;
+import com.exasol.adapter.dialects.*;
 import com.exasol.adapter.dialects.rewriting.SqlGenerationContext;
 import com.exasol.adapter.jdbc.ConnectionFactory;
-import com.exasol.adapter.metadata.*;
+import com.exasol.adapter.metadata.ColumnMetadata;
+import com.exasol.adapter.metadata.DataType;
 import com.exasol.adapter.sql.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,8 +30,8 @@ class HiveSqlGenerationVisitorTest {
     @BeforeEach
     void beforeEach(@Mock final ConnectionFactory connectionFactoryMock) {
         final SqlDialectFactory dialectFactory = new HiveSqlDialectFactory();
-        final SqlDialect dialect = dialectFactory.createSqlDialect(connectionFactoryMock,
-                AdapterProperties.emptyProperties());
+        final SqlDialect dialect = dialectFactory.createSqlDialect(JDBCAdapterContext.builder().connectionFactory(connectionFactoryMock).properties(
+                AdapterProperties.emptyProperties()).build());
         final SqlGenerationContext context = new SqlGenerationContext("test_catalog", "test_schema", false);
         this.visitor = new HiveSqlGenerationVisitor(dialect, context);
     }

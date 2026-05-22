@@ -57,11 +57,13 @@ class HiveSqlDialectIT {
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC = "VIRTUAL_SCHEMA_HIVE_JDBC";
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL = "VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL";
     private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
+    @SuppressWarnings("resource") // Will be closed @Container
     @Container
-    public static DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
+    public static final DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
             HIVE_DOCKER_COMPOSE_YAML) //
-            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
-                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
+                    .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
+                            Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
+    @SuppressWarnings("resource") // Will be closed @Container
     @Container
     private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
     private static Connection exasolConnection;
@@ -94,9 +96,9 @@ class HiveSqlDialectIT {
         connectionDefinition = exasolFactory.createConnectionDefinition(JDBC_CONNECTION_NAME, connectionString,
                 HIVE_USERNAME, HIVE_PASSWORD);
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC).adapterScript(adapterScript)
-                .connectionDefinition(connectionDefinition).properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)).build();
+                .connectionDefinition(connectionDefinition).addProperties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)).build();
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL)
-                .adapterScript(adapterScript).connectionDefinition(connectionDefinition).properties(Map
+                .adapterScript(adapterScript).connectionDefinition(connectionDefinition).addProperties(Map
                         .of("SCHEMA_NAME", SCHEMA_HIVE, "hive_cast_number_to_decimal_with_precision_and_scale", "36,2"))
                 .build();
     }
@@ -109,7 +111,7 @@ class HiveSqlDialectIT {
     }
 
     @AfterEach
-    void afterEach() throws SQLException, ClassNotFoundException {
+    void afterEach() throws SQLException {
         try (final Statement statementHive = hiveConnection.createStatement()) {
             statementHive.execute("DROP TABLE IF EXISTS " + HIVE_SOURCE_TABLE);
         }
@@ -663,7 +665,7 @@ class HiveSqlDialectIT {
         return exasolFactory.createVirtualSchemaBuilder("THE_VS") //
                 .adapterScript(adapterScript) //
                 .connectionDefinition(connectionDefinition) //
-                .properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)) //
+                .addProperties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)) //
                 .build();
     }
 
@@ -707,7 +709,7 @@ class HiveSqlDialectIT {
     }
 
     @Test
-    void testCountTupleAggregateFunction() throws SQLException, ClassNotFoundException {
+    void testCountTupleAggregateFunction() throws SQLException {
         createHiveTable("varchar_col VARCHAR(10), int_col INT",
                 List.of("'one', 1", "'two', 2", "'one', 1", "'two', 2"));
         this.virtualSchema = createVirtualSchema();
@@ -716,7 +718,7 @@ class HiveSqlDialectIT {
         assertVsQuery(query, table().row(2).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
     }
 
-    private static void uploadDriverToBucket() throws BucketAccessException, TimeoutException, FileNotFoundException {
+    private static void uploadDriverToBucket() {
         final Path driverPath = Path.of("src", "test", "resources", "integration", "driver", "hive", JDBC_DRIVER_NAME);
         final JdbcDriver jdbcDriver = JdbcDriver.builder("HIVE").mainClass("com.cloudera.hive.jdbc.HS2Driver")
                 .prefix("jdbc:hive2:").sourceFile(driverPath).enableSecurityManager(false).build();

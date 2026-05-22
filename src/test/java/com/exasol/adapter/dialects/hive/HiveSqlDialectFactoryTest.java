@@ -1,13 +1,14 @@
 package com.exasol.adapter.dialects.hive;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.exasol.adapter.AdapterProperties;
+import com.exasol.adapter.dialects.JDBCAdapterContext;
 
 class HiveSqlDialectFactoryTest {
     private HiveSqlDialectFactory factory;
@@ -24,7 +25,7 @@ class HiveSqlDialectFactoryTest {
 
     @Test
     void testCreateDialect() {
-        assertThat(this.factory.createSqlDialect(null, AdapterProperties.emptyProperties()),
+        assertThat(this.factory.createSqlDialect(JDBCAdapterContext.builder().properties(AdapterProperties.emptyProperties()).build()),
                 instanceOf(HiveSqlDialect.class));
     }
 }
