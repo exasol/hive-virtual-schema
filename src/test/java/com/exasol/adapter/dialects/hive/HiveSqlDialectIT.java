@@ -12,15 +12,20 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.sql.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
@@ -64,8 +69,7 @@ class HiveSqlDialectIT {
                     Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)))
             .withEnv(Map.of(
                     "HIVE_VERSION", "4.2.0",
-                    // TODO
-                    "POSTGRES_LOCAL_PATH", "/home/christoph.pirkl/.m2/repository/org/postgresql/postgresql/42.7.11/postgresql-42.7.11.jar",
+                    "POSTGRES_LOCAL_PATH", findPostgreSqlJdbcDriver(),
                     "HIVE_ZOOKEEPER_QUORUM", "",
                     "HIVE_WAREHOUSE_PATH", "/opt/hive/data/warehouse",
                     "DEFAULT_FS", "file:///",
@@ -136,6 +140,34 @@ class HiveSqlDialectIT {
             if (databaseObject != null) {
                 databaseObject.drop();
             }
+        }
+    }
+
+    private static String findPostgreSqlJdbcDriver() {
+        final Path localRepository = Path.of(System.getProperty("maven.repo.local",
+                Path.of(System.getProperty("user.home"), ".m2", "repository").toString()));
+        final Path postgresDriverDirectory = localRepository.resolve(Path.of("org", "postgresql", "postgresql"));
+        try (Stream<Path> versions = Files.list(postgresDriverDirectory)) {
+            return versions.filter(Files::isDirectory)
+                    .map(version -> version.resolve("postgresql-" + version.getFileName() + ".jar"))
+                    .filter(Files::isRegularFile)
+                    .max(Comparator.comparing(HiveSqlDialectIT::getLastModifiedTime))
+                    .map(Path::toAbsolutePath)
+                    .map(Path::toString)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Could not find PostgreSQL JDBC driver in local Maven repository at "
+                                    + postgresDriverDirectory));
+        } catch (final IOException exception) {
+            throw new UncheckedIOException("Could not search for PostgreSQL JDBC driver in local Maven repository at "
+                    + postgresDriverDirectory, exception);
+        }
+    }
+
+    private static FileTime getLastModifiedTime(final Path path) {
+        try {
+            return Files.getLastModifiedTime(path);
+        } catch (final IOException exception) {
+            throw new UncheckedIOException("Could not read modification time of " + path, exception);
         }
     }
 
