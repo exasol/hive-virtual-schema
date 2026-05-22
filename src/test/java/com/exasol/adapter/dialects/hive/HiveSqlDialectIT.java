@@ -45,7 +45,7 @@ import com.exasol.matcher.TypeMatchMode;
 class HiveSqlDialectIT {
     private static final File HIVE_DOCKER_COMPOSE_YAML = new File(
             "src/test/resources/integration/driver/hive/docker-compose.yaml");
-    private static final String HIVE_SERVICE_NAME = "hive-server_1";
+    private static final String HIVE_SERVICE_NAME = "hiveserver2";
     private static final int HIVE_EXPOSED_PORT = 10000;
     private static final String JDBC_CONNECTION_NAME = "JDBC";
     private static final String SCHEMA_HIVE = "default";
@@ -61,7 +61,19 @@ class HiveSqlDialectIT {
     @Container
     public static final ComposeContainer HIVE = new ComposeContainer(HIVE_DOCKER_COMPOSE_YAML)
             .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
-                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
+                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)))
+            .withEnv(Map.of(
+                    "HIVE_VERSION", "4.2.0",
+                    // TODO
+                    "POSTGRES_LOCAL_PATH", "/home/christoph.pirkl/.m2/repository/org/postgresql/postgresql/42.7.11/postgresql-42.7.11.jar",
+                    "HIVE_ZOOKEEPER_QUORUM", "",
+                    "HIVE_WAREHOUSE_PATH", "/opt/hive/data/warehouse",
+                    "DEFAULT_FS", "file:///",
+
+                    // Suppress warnings about unset variables
+                    "S3_ENDPOINT_URL", "",
+                    "AWS_ACCESS_KEY_ID", "",
+                    "AWS_SECRET_ACCESS_KEY", ""));
     @SuppressWarnings("resource") // Will be closed @Container
     @Container
     private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
