@@ -11,10 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.List;
@@ -64,9 +62,7 @@ class HiveSqlDialectIT {
     private VirtualSchema virtualSchema;
 
     @BeforeAll
-    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, ClassNotFoundException,
-            IllegalAccessException, InstantiationException, MalformedURLException, NoSuchMethodException,
-            InvocationTargetException, FileNotFoundException {
+    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, FileNotFoundException {
         uploadDriverToBucket();
         uploadVsJarToBucket(EXASOL.getDefaultBucket());
         exasolConnection = EXASOL.createConnection("");
