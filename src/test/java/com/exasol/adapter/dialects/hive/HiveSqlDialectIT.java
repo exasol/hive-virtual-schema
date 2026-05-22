@@ -77,7 +77,7 @@ class HiveSqlDialectIT {
                     "AWS_SECRET_ACCESS_KEY", ""));
     @SuppressWarnings("resource") // Will be closed @Container
     @Container
-    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
+    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>("2026.1.0").withReuse(true); //
     private static Connection exasolConnection;
     private static Statement statementExasol;
     private static ExasolObjectFactory exasolFactory;
