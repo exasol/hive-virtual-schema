@@ -1,4 +1,4 @@
-# Virtual Schema for Hive 4.0.0, released 2026-05-22
+# Virtual Schema for Hive 4.0.0, released 2026-05-26
 
 Code name: Anonymous telemetry
 

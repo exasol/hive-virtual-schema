@@ -428,4 +428,4 @@ The driver is also available directly from [Simba technologies](http://www.simba
 Virtual Schema Version| Hive Version | Driver Name    | Driver Version 
 ----------------------|--------------|----------------|-----------------
  2.0.5                | 2.3.2        | HiveJDBC42.jar | 2.6.23
- 4.0.0                | 2.3.2        | HiveJDBC42.jar | 2.6.30
+ 4.0.0                | 4.2.0        | HiveJDBC42.jar | 2.6.30
