@@ -69,6 +69,7 @@ class HiveSqlDialectIT {
                     "HIVE_ZOOKEEPER_QUORUM", "",
                     "HIVE_WAREHOUSE_PATH", "/opt/hive/data/warehouse",
                     "DEFAULT_FS", "file:///",
+                    "HIVE_EXECUTION_ENGINE", "mr",
 
                     // Suppress warnings about unset variables
                     "S3_ENDPOINT_URL", "",

@@ -42,7 +42,7 @@ services:
     environment:
       DEFAULT_FS: "${DEFAULT_FS}"
       HIVE_WAREHOUSE_PATH: "${HIVE_WAREHOUSE_PATH}"
-      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/tools/lib/*
+      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/client/hadoop-client-runtime-3.4.1.jar:/opt/hadoop/share/hadoop/client/hadoop-client-api-3.4.1.jar:/opt/hadoop/share/hadoop/tools/lib/*
       DB_DRIVER: postgres
       SERVICE_NAME: 'metastore'
       SERVICE_OPTS: >
@@ -71,7 +71,7 @@ services:
     hostname: hiveserver2
     environment:
       USER: hive
-      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/tools/lib/*
+      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/client/hadoop-client-runtime-3.4.1.jar:/opt/hadoop/share/hadoop/client/hadoop-client-api-3.4.1.jar:/opt/hadoop/share/hadoop/tools/lib/*
       HIVE_SERVER2_THRIFT_PORT: 10000
 
       # Directories shared between HiveServer2 and LLAP daemon
