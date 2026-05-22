@@ -10,7 +10,6 @@ public final class IntegrationTestConstants {
     public static final String TABLE_JOIN_1 = "TABLE_JOIN_1";
     public static final String TABLE_JOIN_2 = "TABLE_JOIN_2";
     public static final String DOCKER_IP_ADDRESS = "172.17.0.1";
-    public static final String JDBC_DRIVER_CONFIGURATION_FILE_NAME = "settings.cfg";
     public static final String JDBC_DRIVER_NAME = "HiveJDBC42.jar";
 
     private IntegrationTestConstants() {
