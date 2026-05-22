@@ -22,7 +22,7 @@
 | [Apache Commons Compress][16]                   | [Apache-2.0][17]                 |
 | [Test Database Builder for Java][18]            | [MIT License][19]                |
 | [Matcher for SQL Result Sets][20]               | [MIT License][21]                |
-| [SLF4J JDK14 Binding][22]                       | [MIT License][23]                |
+| [SLF4J JDK14 Provider][22]                      | [MIT][23]                        |
 
 ## Plugin Dependencies
 
@@ -75,7 +75,7 @@
 [20]: https://github.com/exasol/hamcrest-resultset-matcher/
 [21]: https://github.com/exasol/hamcrest-resultset-matcher/blob/main/LICENSE
 [22]: http://www.slf4j.org
-[23]: http://www.opensource.org/licenses/mit-license.php
+[23]: https://opensource.org/license/mit
 [24]: https://docs.sonarsource.com/sonarqube-server/latest/extension-guide/developing-a-plugin/plugin-basics/sonar-scanner-maven/sonar-maven-plugin/
 [25]: http://www.gnu.org/licenses/lgpl.txt
 [26]: https://maven.apache.org/plugins/maven-toolchains-plugin/
