@@ -15,6 +15,8 @@
     </parent>
     <properties>
         <vscjdbc.version>14.0.2</vscjdbc.version>
+        <!-- Integration tests disabled, see doc/developer_guide.md for details. -->
+        <skipIntegrationTests>true</skipIntegrationTests>
     </properties>
     <dependencies>
         <dependency>
@@ -133,8 +135,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <!-- Integration tests disabled, see doc/developer_guide.md for details. -->
-                    <skip>true</skip>
+                    <skip>${skipIntegrationTests}</skip>
                     <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
