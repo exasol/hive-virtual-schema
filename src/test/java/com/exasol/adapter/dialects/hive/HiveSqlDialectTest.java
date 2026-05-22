@@ -8,7 +8,8 @@ import static com.exasol.adapter.capabilities.MainCapability.*;
 import static com.exasol.adapter.capabilities.PredicateCapability.*;
 import static com.exasol.adapter.capabilities.ScalarFunctionCapability.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -188,14 +189,12 @@ class HiveSqlDialectTest {
         final RemoteMetadataReaderException exception = assertThrows(RemoteMetadataReaderException.class,
                 dialect::createRemoteMetadataReader);
 
-        assertAll(() -> assertThat(exception.getMessage(), containsString("E-VSHIVE-1")),
-                () -> assertThat(exception.getMessage(), containsString("connection failed")));
+        assertThat(exception.getMessage(), equalTo("E-VSHIVE-1: Unable to create Hive remote metadata reader. Caused by: connection failed"));
     }
 
     @Test
     void testCreateQueryRewriter() {
-        assertThat(testee().createQueryRewriter(),
-                instanceOf(QueryRewriter.class));
+        assertThat(testee().createQueryRewriter(), instanceOf(QueryRewriter.class));
     }
 
     private void setMandatoryProperties() {

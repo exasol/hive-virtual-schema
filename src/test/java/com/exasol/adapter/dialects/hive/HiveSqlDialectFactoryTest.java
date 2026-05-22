@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.dialects.JDBCAdapterContext;
 
 class HiveSqlDialectFactoryTest {
@@ -25,12 +24,13 @@ class HiveSqlDialectFactoryTest {
 
     @Test
     void testCreateDialect() {
-        assertThat(this.factory.createSqlDialect(JDBCAdapterContext.builder().properties(AdapterProperties.emptyProperties()).build()),
+        assertThat(this.factory.createSqlDialect(JDBCAdapterContext.builder().build()),
                 instanceOf(HiveSqlDialect.class));
     }
 
     @Test
     void testGetSqlDialectVersion() {
+        // Only works when running from a built artifact
         assertThat(this.factory.getSqlDialectVersion(), equalTo("UNKNOWN"));
     }
 
