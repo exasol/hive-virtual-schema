@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
@@ -40,6 +42,7 @@ import com.exasol.matcher.TypeMatchMode;
 @Tag("integration")
 @Testcontainers
 class HiveSqlDialectIT {
+    private static final Logger LOGGER = Logger.getLogger(HiveSqlDialectIT.class.getName());
     private static final String JDBC_CONNECTION_NAME = "JDBC";
     private static final String TABLE_HIVE_SIMPLE = "TABLE_HIVE_SIMPLE";
     private static final String TABLE_HIVE_DECIMAL_CAST = "TABLE_HIVE_DECIMAL_CAST";
@@ -110,6 +113,12 @@ class HiveSqlDialectIT {
                 databaseObject.drop();
             }
         }
+    }
+
+    @BeforeEach
+    void logTestExecution(final TestInfo testInfo) {
+        LOGGER.info(() -> "Executing " + testInfo.getTestClass().map(Class::getSimpleName).orElse("unknown class")
+                + "." + testInfo.getTestMethod().map(Member::getName).orElse("unknown method"));
     }
 
     private static void createTableHiveSimple(final Statement statementHive) throws SQLException {
