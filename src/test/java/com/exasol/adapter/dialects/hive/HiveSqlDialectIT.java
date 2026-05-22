@@ -695,8 +695,12 @@ class HiveSqlDialectIT {
 
     private static void uploadDriverToBucket() {
         final Path driverPath = Path.of("src", "test", "resources", "integration", "driver", "hive", JDBC_DRIVER_NAME);
-        final JdbcDriver jdbcDriver = JdbcDriver.builder("HIVE").mainClass("com.cloudera.hive.jdbc.HS2Driver")
-                .prefix("jdbc:hive2:").sourceFile(driverPath).enableSecurityManager(false).build();
+        final JdbcDriver jdbcDriver = JdbcDriver.builder("HIVE")
+                .mainClass("com.cloudera.hive.jdbc.HS2Driver")
+                .prefix("jdbc:hive2:")
+                .sourceFile(driverPath)
+                .enableSecurityManager(false)
+                .build();
         EXASOL.getDriverManager().install(jdbcDriver);
     }
 
