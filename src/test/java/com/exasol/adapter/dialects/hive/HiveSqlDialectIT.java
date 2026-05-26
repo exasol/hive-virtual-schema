@@ -95,8 +95,10 @@ class HiveSqlDialectIT {
         try (final Statement statementHive = hiveConnection.createStatement()) {
             statementHive.execute("DROP TABLE IF EXISTS " + HIVE_SOURCE_TABLE);
         }
-        this.virtualSchema.drop();
-        this.virtualSchema = null;
+        if (this.virtualSchema != null) {
+            this.virtualSchema.drop();
+            this.virtualSchema = null;
+        }
     }
 
     @AfterAll
