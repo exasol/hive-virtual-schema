@@ -2,14 +2,13 @@ package com.exasol.adapter.dialects.hive;
 
 import static com.exasol.adapter.dialects.IntegrationTestConstants.DOCKER_IP_ADDRESS;
 
-import java.io.*;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.sql.*;
 import java.time.Duration;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.Properties;
 
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -58,7 +57,7 @@ class HiveContainerFixture implements AutoCloseable {
     private static Map<String, String> dockerComposeEnvironment() {
         return Map.of(
                 "HIVE_VERSION", "4.2.0",
-                "POSTGRES_LOCAL_PATH", findPostgreSqlJdbcDriver(),
+                "POSTGRES_LOCAL_PATH", getPostgreSqlJdbcDriverPath(),
                 "HIVE_ZOOKEEPER_QUORUM", "",
                 "HIVE_WAREHOUSE_PATH", "/opt/hive/data/warehouse",
                 "DEFAULT_FS", "file:///",
@@ -84,32 +83,14 @@ class HiveContainerFixture implements AutoCloseable {
         }
     }
 
-    private static String findPostgreSqlJdbcDriver() {
-        final Path localRepository = Path.of(System.getProperty("maven.repo.local",
-                Path.of(System.getProperty("user.home"), ".m2", "repository").toString()));
-        final Path postgresDriverDirectory = localRepository.resolve(Path.of("org", "postgresql", "postgresql"));
-        try (Stream<Path> versions = Files.list(postgresDriverDirectory)) {
-            return versions.filter(Files::isDirectory)
-                    .map(version -> version.resolve("postgresql-" + version.getFileName() + ".jar"))
-                    .filter(Files::isRegularFile)
-                    .max(Comparator.comparing(HiveContainerFixture::getLastModifiedTime))
-                    .map(Path::toAbsolutePath)
-                    .map(Path::toString)
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Could not find PostgreSQL JDBC driver in local Maven repository at "
-                                    + postgresDriverDirectory));
-        } catch (final IOException exception) {
-            throw new UncheckedIOException("Could not search for PostgreSQL JDBC driver in local Maven repository at "
-                    + postgresDriverDirectory, exception);
+    private static String getPostgreSqlJdbcDriverPath() {
+        final Path driverPath = Path.of("target/postgresql-jdbc-driver.jar").toAbsolutePath();
+        if (!Files.isRegularFile(driverPath)) {
+            throw new IllegalStateException(
+                    "PostgreSQL JDBC driver not found at " + driverPath.toAbsolutePath()
+                            + ". Ensure that maven-dependency-plugin has copied the driver to the target directory.");
         }
-    }
-
-    private static FileTime getLastModifiedTime(final Path path) {
-        try {
-            return Files.getLastModifiedTime(path);
-        } catch (final IOException exception) {
-            throw new UncheckedIOException("Could not read modification time of " + path, exception);
-        }
+        return driverPath.toString();
     }
 
     String getUser() {
