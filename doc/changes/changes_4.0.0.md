@@ -46,6 +46,7 @@ Starting with this release, this Virtual Schema no longer supports Exasol 7.1. T
 * Updated `org.apache.maven.plugins:maven-assembly-plugin:3.7.1` to `3.8.0`
 * Updated `org.apache.maven.plugins:maven-clean-plugin:3.4.1` to `3.5.0`
 * Updated `org.apache.maven.plugins:maven-compiler-plugin:3.14.0` to `3.15.0`
+* Added `org.apache.maven.plugins:maven-dependency-plugin:3.7.0`
 * Updated `org.apache.maven.plugins:maven-enforcer-plugin:3.5.0` to `3.6.2`
 * Updated `org.apache.maven.plugins:maven-failsafe-plugin:3.5.3` to `3.5.5`
 * Updated `org.apache.maven.plugins:maven-jar-plugin:3.4.2` to `3.5.0`
