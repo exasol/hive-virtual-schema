@@ -10,29 +10,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.math.BigDecimal;
-import java.net.*;
 import java.nio.file.Path;
 import java.sql.*;
-import java.time.Duration;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
-import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.exasol.bucketfs.Bucket;
 import com.exasol.bucketfs.BucketAccessException;
 import com.exasol.containers.ExasolContainer;
-import com.exasol.dbbuilder.dialects.DatabaseObject;
 import com.exasol.dbbuilder.dialects.exasol.*;
 import com.exasol.drivers.JdbcDriver;
 import com.exasol.matcher.TypeMatchMode;
@@ -43,27 +39,18 @@ import com.exasol.matcher.TypeMatchMode;
 @Tag("integration")
 @Testcontainers
 class HiveSqlDialectIT {
-    private static final File HIVE_DOCKER_COMPOSE_YAML = new File(
-            "src/test/resources/integration/driver/hive/docker-compose.yaml");
-    private static final String HIVE_SERVICE_NAME = "hive-server_1";
-    private static final int HIVE_EXPOSED_PORT = 10000;
+    private static final Logger LOGGER = Logger.getLogger(HiveSqlDialectIT.class.getName());
     private static final String JDBC_CONNECTION_NAME = "JDBC";
-    private static final String SCHEMA_HIVE = "default";
-    private static final String HIVE_USERNAME = "hive";
-    private static final String HIVE_PASSWORD = "hive";
     private static final String TABLE_HIVE_SIMPLE = "TABLE_HIVE_SIMPLE";
     private static final String TABLE_HIVE_DECIMAL_CAST = "TABLE_HIVE_DECIMAL_CAST";
     private static final String TABLE_HIVE_ALL_DATA_TYPES = "TABLE_HIVE_ALL_DATA_TYPES";
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC = "VIRTUAL_SCHEMA_HIVE_JDBC";
     private static final String VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL = "VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL";
     private static final String HIVE_SOURCE_TABLE = "HIVE_SOURCE";
+    private static final HiveContainerFixture HIVE = HiveContainerFixture.start();
+    @SuppressWarnings("resource") // Will be closed @Container
     @Container
-    public static DockerComposeContainer<? extends DockerComposeContainer<?>> HIVE = new DockerComposeContainer<>(
-            HIVE_DOCKER_COMPOSE_YAML) //
-            .withExposedService(HIVE_SERVICE_NAME, HIVE_EXPOSED_PORT,
-                    Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
-    @Container
-    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>().withReuse(true); //
+    private static final ExasolContainer<? extends ExasolContainer<?>> EXASOL = new ExasolContainer<>("2026.1.0").withReuse(true); //
     private static Connection exasolConnection;
     private static Statement statementExasol;
     private static ExasolObjectFactory exasolFactory;
@@ -73,32 +60,45 @@ class HiveSqlDialectIT {
     private VirtualSchema virtualSchema;
 
     @BeforeAll
-    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, ClassNotFoundException,
-            IllegalAccessException, InstantiationException, MalformedURLException, NoSuchMethodException,
-            InvocationTargetException, FileNotFoundException {
+    static void beforeAll() throws BucketAccessException, TimeoutException, SQLException, FileNotFoundException {
         uploadDriverToBucket();
         uploadVsJarToBucket(EXASOL.getDefaultBucket());
         exasolConnection = EXASOL.createConnection("");
         statementExasol = exasolConnection.createStatement();
-        hiveConnection = getHiveConnection();
+        hiveConnection = HIVE.getHiveConnection();
         final Statement statementHive = hiveConnection.createStatement();
         createTableHiveSimple(statementHive);
         createTableDecimalCast(statementHive);
         createTableAllDataTypes(statementHive);
-        createTestTablesForJoinTests(statementHive, SCHEMA_HIVE);
+        createTestTablesForJoinTests(statementHive, HIVE.getSchema());
         exasolFactory = new ExasolObjectFactory(exasolConnection);
         final ExasolSchema schema = exasolFactory.createSchema(SCHEMA_EXASOL);
         adapterScript = createAdapterScript(schema);
-        final String connectionString = "jdbc:hive2://" + DOCKER_IP_ADDRESS + ":" + HIVE_EXPOSED_PORT + "/"
-                + SCHEMA_HIVE;
-        connectionDefinition = exasolFactory.createConnectionDefinition(JDBC_CONNECTION_NAME, connectionString,
-                HIVE_USERNAME, HIVE_PASSWORD);
+        connectionDefinition = exasolFactory.createConnectionDefinition(JDBC_CONNECTION_NAME,
+                HIVE.getExasolConnectionString(), HIVE.getUser(), HIVE.getPassword());
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC).adapterScript(adapterScript)
-                .connectionDefinition(connectionDefinition).properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)).build();
+                .connectionDefinition(connectionDefinition).addProperties(Map.of("SCHEMA_NAME", HIVE.getSchema())).build();
         exasolFactory.createVirtualSchemaBuilder(VIRTUAL_SCHEMA_HIVE_JDBC_NUMBER_TO_DECIMAL)
-                .adapterScript(adapterScript).connectionDefinition(connectionDefinition).properties(Map
-                        .of("SCHEMA_NAME", SCHEMA_HIVE, "hive_cast_number_to_decimal_with_precision_and_scale", "36,2"))
+                .adapterScript(adapterScript).connectionDefinition(connectionDefinition).addProperties(Map
+                        .of("SCHEMA_NAME", HIVE.getSchema(), "hive_cast_number_to_decimal_with_precision_and_scale", "36,2"))
                 .build();
+    }
+
+    @BeforeEach
+    void logTestExecution(final TestInfo testInfo) {
+        LOGGER.info(() -> "Executing " + testInfo.getTestClass().map(Class::getSimpleName).orElse("unknown class")
+                + "." + testInfo.getTestMethod().map(Member::getName).orElse("unknown method"));
+    }
+
+    @AfterEach
+    void afterEach() throws SQLException {
+        try (final Statement statementHive = hiveConnection.createStatement()) {
+            statementHive.execute("DROP TABLE IF EXISTS " + HIVE_SOURCE_TABLE);
+        }
+        if (this.virtualSchema != null) {
+            this.virtualSchema.drop();
+            this.virtualSchema = null;
+        }
     }
 
     @AfterAll
@@ -106,38 +106,7 @@ class HiveSqlDialectIT {
         exasolConnection.close();
         statementExasol.close();
         hiveConnection.close();
-    }
-
-    @AfterEach
-    void afterEach() throws SQLException, ClassNotFoundException {
-        try (final Statement statementHive = hiveConnection.createStatement()) {
-            statementHive.execute("DROP TABLE IF EXISTS " + HIVE_SOURCE_TABLE);
-        }
-        dropAll(this.virtualSchema);
-        this.virtualSchema = null;
-    }
-
-    private static void dropAll(final DatabaseObject... databaseObjects) {
-        for (final DatabaseObject databaseObject : databaseObjects) {
-            if (databaseObject != null) {
-                databaseObject.drop();
-            }
-        }
-    }
-
-    private static Connection getHiveConnection() throws ClassNotFoundException, SQLException, MalformedURLException,
-            IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        final Driver driver = loadJDBCDriver();
-        return driver.connect("jdbc:hive2://localhost:" + HIVE_EXPOSED_PORT + "/" + SCHEMA_HIVE, new Properties());
-    }
-
-    private static Driver loadJDBCDriver() throws MalformedURLException, ClassNotFoundException, InstantiationException,
-            IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        final File file = new File("src/test/resources/integration/driver/hive/HiveJDBC42.jar");
-        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { file.toURI().toURL() },
-                HiveSqlDialectIT.class.getClassLoader());
-        final Class<?> driverClass = urlClassLoader.loadClass("com.cloudera.hive.jdbc.HS2Driver");
-        return (Driver) driverClass.getDeclaredConstructor().newInstance();
+        HIVE.close();
     }
 
     private static void createTableHiveSimple(final Statement statementHive) throws SQLException {
@@ -302,21 +271,21 @@ class HiveSqlDialectIT {
                 + "COLUMN_NUM_SCALE DECIMAL(18, 0), " //
                 + "COLUMN_DEFAULT VARCHAR(2000))");
         statementExasol.execute("INSERT INTO " + expectedSchemaQualifiedTableName + " VALUES " //
-                + "('ARRAYCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
+                + "('ARRAYCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
                 + "('BIGINTEGER', 'DECIMAL(19,0)', 19, 19, 0, NULL), " //
                 + "('BOOLCOLUMN', 'BOOLEAN', 1, NULL, NULL, NULL), " //
-                + "('CHARCOLUMN', 'CHAR(1) ASCII', 1, NULL, NULL, NULL), " //
+                + "('CHARCOLUMN', 'CHAR(1) UTF8', 1, NULL, NULL, NULL), " //
                 + "('DECIMALCOL', 'DECIMAL(10,0)', 10, 10, 0, NULL), " //
                 + "('DOUBLECOL', 'DOUBLE', 64, NULL, NULL, NULL), " //
                 + "('FLOATCOL', 'DOUBLE', 64, NULL, NULL, NULL), " //
                 + "('INTCOL', 'DECIMAL(10,0)', 10, 10, 0, NULL), " //
-                + "('MAPCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
+                + "('MAPCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
                 + "('SMALLINTEGER', 'DECIMAL(5,0)', 5, 5, 0, NULL), " //
-                + "('STRINGCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
-                + "('STRUCTCOL', 'VARCHAR(255) ASCII', 255, NULL, NULL, NULL), " //
-                + "('TIMESTAMPCOL', 'TIMESTAMP', 29, NULL, NULL, NULL), " //
+                + "('STRINGCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
+                + "('STRUCTCOL', 'VARCHAR(255) UTF8', 255, NULL, NULL, NULL), " //
+                + "('TIMESTAMPCOL', 'TIMESTAMP(9)', 29, 9, NULL, NULL), " //
                 + "('TINYINTEGER', 'DECIMAL(3,0)', 3, 3, 0, NULL), " //
-                + "('VARCHARCOL', 'VARCHAR(10) ASCII', 10, NULL, NULL, NULL), " //
+                + "('VARCHARCOL', 'VARCHAR(10) UTF8', 10, NULL, NULL, NULL), " //
                 + "('BINARYCOL', 'VARCHAR(2000000) UTF8', 2000000, NULL, NULL, NULL), " //
                 + "('DATECOL', 'DATE', 10, NULL, NULL, NULL) " //
         );
@@ -380,7 +349,7 @@ class HiveSqlDialectIT {
         final String query = "SELECT BIGINTEGER FROM " + qualifiedTableName;
         assertAll(() -> assertExpressionExecutionBigDecimalResult(query, new BigDecimal("56")),
                 () -> assertExplainVirtual(query, "SELECT `" + TABLE_HIVE_ALL_DATA_TYPES + "`.`BIGINTEGER` FROM `"
-                        + SCHEMA_HIVE + "`.`" + TABLE_HIVE_ALL_DATA_TYPES + "`"));
+                        + HIVE.getSchema() + "`.`" + TABLE_HIVE_ALL_DATA_TYPES + "`"));
     }
 
     private void assertExpressionExecutionBigDecimalResult(final String query, final BigDecimal expectedValue)
@@ -403,7 +372,7 @@ class HiveSqlDialectIT {
         final String qualifiedTableName = VIRTUAL_SCHEMA_HIVE_JDBC + "." + TABLE_HIVE_ALL_DATA_TYPES;
         final String query = "SELECT BINARYCOL FROM " + qualifiedTableName;
         final String expectedExplainVirtual = "SELECT base64(`" + TABLE_HIVE_ALL_DATA_TYPES + "`.`BINARYCOL`) FROM `"
-                + SCHEMA_HIVE + "`.`" + TABLE_HIVE_ALL_DATA_TYPES;
+                + HIVE.getSchema() + "`.`" + TABLE_HIVE_ALL_DATA_TYPES;
         assertAll(() -> assertExpressionExecutionStringResult(query, "TVRBeE1BPT0="),
                 () -> assertExplainVirtual(query, expectedExplainVirtual));
     }
@@ -663,7 +632,7 @@ class HiveSqlDialectIT {
         return exasolFactory.createVirtualSchemaBuilder("THE_VS") //
                 .adapterScript(adapterScript) //
                 .connectionDefinition(connectionDefinition) //
-                .properties(Map.of("SCHEMA_NAME", SCHEMA_HIVE)) //
+                .addProperties(Map.of("SCHEMA_NAME", HIVE.getSchema())) //
                 .build();
     }
 
@@ -707,7 +676,7 @@ class HiveSqlDialectIT {
     }
 
     @Test
-    void testCountTupleAggregateFunction() throws SQLException, ClassNotFoundException {
+    void testCountTupleAggregateFunction() throws SQLException {
         createHiveTable("varchar_col VARCHAR(10), int_col INT",
                 List.of("'one', 1", "'two', 2", "'one', 1", "'two', 2"));
         this.virtualSchema = createVirtualSchema();
@@ -716,10 +685,14 @@ class HiveSqlDialectIT {
         assertVsQuery(query, table().row(2).matches(TypeMatchMode.NO_JAVA_TYPE_CHECK));
     }
 
-    private static void uploadDriverToBucket() throws BucketAccessException, TimeoutException, FileNotFoundException {
+    private static void uploadDriverToBucket() {
         final Path driverPath = Path.of("src", "test", "resources", "integration", "driver", "hive", JDBC_DRIVER_NAME);
-        final JdbcDriver jdbcDriver = JdbcDriver.builder("HIVE").mainClass("com.cloudera.hive.jdbc.HS2Driver")
-                .prefix("jdbc:hive2:").sourceFile(driverPath).enableSecurityManager(false).build();
+        final JdbcDriver jdbcDriver = JdbcDriver.builder("HIVE")
+                .mainClass("com.cloudera.hive.jdbc.HS2Driver")
+                .prefix("jdbc:hive2:")
+                .sourceFile(driverPath)
+                .enableSecurityManager(false)
+                .build();
         EXASOL.getDriverManager().install(jdbcDriver);
     }
 

@@ -9,32 +9,62 @@ import static com.exasol.adapter.capabilities.PredicateCapability.*;
 import static com.exasol.adapter.capabilities.ScalarFunctionCapability.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.exasol.ExaMetadata;
 import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.capabilities.Capabilities;
-import com.exasol.adapter.dialects.SqlDialect;
+import com.exasol.adapter.dialects.*;
+import com.exasol.adapter.dialects.rewriting.SqlGenerationContext;
+import com.exasol.adapter.jdbc.ConnectionFactory;
+import com.exasol.adapter.jdbc.RemoteMetadataReaderException;
 import com.exasol.adapter.properties.PropertyValidationException;
+import com.exasol.adapter.sql.ScalarFunction;
 
+@ExtendWith(MockitoExtension.class)
 class HiveSqlDialectTest {
     private HiveSqlDialect dialect;
     private Map<String, String> rawProperties;
+    @Mock
+    ConnectionFactory connectionFactoryMock;
+    @Mock
+    ExaMetadata exaMetadataMock;
 
     @BeforeEach
     void beforeEach() {
-        this.dialect = new HiveSqlDialect(null, AdapterProperties.emptyProperties());
+        lenient().when(exaMetadataMock.getDatabaseVersion()).thenReturn("1.2.3");
+        this.dialect = testee();
         this.rawProperties = new HashMap<>();
+    }
+
+    private HiveSqlDialect testee() {
+        return testee(AdapterProperties.emptyProperties());
+    }
+
+    private HiveSqlDialect testee(final AdapterProperties emptyProperties) {
+        return new HiveSqlDialect(
+                JDBCAdapterContext.builder().properties(emptyProperties)
+                        .connectionFactory(connectionFactoryMock)
+                        .metadata(exaMetadataMock).build());
     }
 
     @Test
@@ -65,11 +95,16 @@ class HiveSqlDialectTest {
     }
 
     @Test
+    void testGetName() {
+        assertThat(this.dialect.getName(), equalTo("HIVE"));
+    }
+
+    @Test
     void testValidateCatalogProperty() throws PropertyValidationException {
         setMandatoryProperties();
         this.rawProperties.put(CATALOG_NAME_PROPERTY, "MY_CATALOG");
         final AdapterProperties adapterProperties = new AdapterProperties(this.rawProperties);
-        final SqlDialect sqlDialect = new HiveSqlDialect(null, adapterProperties);
+        final SqlDialect sqlDialect = testee(adapterProperties);
         sqlDialect.validateProperties();
     }
 
@@ -78,8 +113,18 @@ class HiveSqlDialectTest {
         setMandatoryProperties();
         this.rawProperties.put(SCHEMA_NAME_PROPERTY, "MY_SCHEMA");
         final AdapterProperties adapterProperties = new AdapterProperties(this.rawProperties);
-        final SqlDialect sqlDialect = new HiveSqlDialect(null, adapterProperties);
+        final SqlDialect sqlDialect = testee(adapterProperties);
         sqlDialect.validateProperties();
+    }
+
+    @Test
+    void testSupportsJdbcCatalogs() {
+        assertThat(this.dialect.supportsJdbcCatalogs(), equalTo(SqlDialect.StructureElementSupport.SINGLE));
+    }
+
+    @Test
+    void testSupportsJdbcSchemas() {
+        assertThat(this.dialect.supportsJdbcSchemas(), equalTo(SqlDialect.StructureElementSupport.MULTIPLE));
     }
 
     @CsvSource({ "tableName, `tableName`", //
@@ -101,6 +146,55 @@ class HiveSqlDialectTest {
     @Test
     void testGetLiteralStringNull() {
         assertThat(this.dialect.getStringLiteral(null), CoreMatchers.equalTo("NULL"));
+    }
+
+    @Test
+    void testRequiresCatalogQualifiedTableNames() {
+        assertThat(this.dialect.requiresCatalogQualifiedTableNames(null), equalTo(false));
+    }
+
+    @Test
+    void testRequiresSchemaQualifiedTableNames() {
+        assertThat(this.dialect.requiresSchemaQualifiedTableNames(null), equalTo(true));
+    }
+
+    @Test
+    void testGetDefaultNullSorting() {
+        assertThat(this.dialect.getDefaultNullSorting(), equalTo(SqlDialect.NullSorting.NULLS_SORTED_LOW));
+    }
+
+    @Test
+    void testGetSqlGenerator() {
+        final SqlGenerationContext context = new SqlGenerationContext("catalog", "schema", false);
+        assertThat(this.dialect.getSqlGenerator(context), instanceOf(HiveSqlGenerationVisitor.class));
+    }
+
+    @Test
+    void testGetScalarFunctionAliases() {
+        assertThat(this.dialect.getScalarFunctionAliases(),
+                equalTo(Map.of(ScalarFunction.ADD_DAYS, "DATE_ADD", ScalarFunction.DAYS_BETWEEN, "DATEDIFF",
+                        ScalarFunction.WEEK, "WEEKOFYEAR", ScalarFunction.CURRENT_USER, "CURRENT_USER()",
+                        ScalarFunction.BIT_LSHIFT, "SHIFTLEFT", ScalarFunction.BIT_RSHIFT, "SHIFTRIGHT")));
+    }
+
+    @Test
+    void testCreateRemoteMetadataReader() {
+        assertThat(testee().createRemoteMetadataReader(),
+                instanceOf(HiveMetadataReader.class));
+    }
+
+    @Test
+    void testCreateRemoteMetadataReaderWrapsSqlException() throws SQLException {
+        when(connectionFactoryMock.getConnection()).thenThrow(new SQLException("connection failed"));
+        final RemoteMetadataReaderException exception = assertThrows(RemoteMetadataReaderException.class,
+                dialect::createRemoteMetadataReader);
+
+        assertThat(exception.getMessage(), equalTo("E-VSHIVE-1: Unable to create Hive remote metadata reader. Caused by: connection failed"));
+    }
+
+    @Test
+    void testCreateQueryRewriter() {
+        assertThat(testee().createQueryRewriter(), instanceOf(QueryRewriter.class));
     }
 
     private void setMandatoryProperties() {

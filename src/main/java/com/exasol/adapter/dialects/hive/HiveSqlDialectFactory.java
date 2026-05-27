@@ -1,8 +1,6 @@
 package com.exasol.adapter.dialects.hive;
 
-import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.dialects.*;
-import com.exasol.adapter.jdbc.ConnectionFactory;
 import com.exasol.logging.VersionCollector;
 
 /**
@@ -15,8 +13,8 @@ public class HiveSqlDialectFactory implements SqlDialectFactory {
     }
 
     @Override
-    public SqlDialect createSqlDialect(final ConnectionFactory connectionFactory, final AdapterProperties properties) {
-        return new HiveSqlDialect(connectionFactory, properties);
+    public SqlDialect createSqlDialect(final JDBCAdapterContext context) {
+        return new HiveSqlDialect(context);
     }
 
     @Override
@@ -24,5 +22,10 @@ public class HiveSqlDialectFactory implements SqlDialectFactory {
         final VersionCollector versionCollector = new VersionCollector(
                 "META-INF/maven/com.exasol/hive-virtual-schema/pom.properties");
         return versionCollector.getVersionNumber();
+    }
+
+    @Override
+    public String getAdapterProjectShortTag() {
+        return "VSHIVE";
     }
 }

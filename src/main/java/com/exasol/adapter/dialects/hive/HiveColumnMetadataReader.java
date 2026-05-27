@@ -5,6 +5,7 @@ import static com.exasol.adapter.dialects.hive.HiveProperties.HIVE_CAST_NUMBER_T
 import java.sql.Connection;
 import java.sql.Types;
 
+import com.exasol.ExaMetadata;
 import com.exasol.adapter.AdapterProperties;
 import com.exasol.adapter.dialects.IdentifierConverter;
 import com.exasol.adapter.jdbc.BaseColumnMetadataReader;
@@ -21,11 +22,12 @@ public class HiveColumnMetadataReader extends BaseColumnMetadataReader {
      *
      * @param connection          connection to the remote data source
      * @param properties          user-defined adapter properties
+     * @param exaMetadata         Exasol metadata
      * @param identifierConverter converter between source and Exasol identifiers
      */
-    public HiveColumnMetadataReader(final Connection connection, final AdapterProperties properties,
+    public HiveColumnMetadataReader(final Connection connection, final AdapterProperties properties, final ExaMetadata exaMetadata,
             final IdentifierConverter identifierConverter) {
-        super(connection, properties, identifierConverter);
+        super(connection, properties, exaMetadata, identifierConverter);
     }
 
     @Override
