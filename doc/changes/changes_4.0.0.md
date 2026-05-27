@@ -12,7 +12,7 @@ Starting with this release, this Virtual Schema no longer supports Exasol 7.1. T
 
 ## Features
 
-* #139: Added anonymous feature-usage tracking
+* #62: Added anonymous feature-usage tracking
 
 ## Dependency Updates
 
