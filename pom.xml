@@ -3,18 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.exasol</groupId>
     <artifactId>hive-virtual-schema</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <name>Virtual Schema for Hive</name>
     <description>Virtual Schema for Hive</description>
     <url>https://github.com/exasol/hive-virtual-schema/</url>
     <parent>
         <artifactId>hive-virtual-schema-generated-parent</artifactId>
         <groupId>com.exasol</groupId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
         <relativePath>pk_generated_parent.pom</relativePath>
     </parent>
     <properties>
-        <vscjdbc.version>14.0.2</vscjdbc.version>
+        <vscjdbc.version>14.0.4</vscjdbc.version>
         <!-- Integration tests disabled, see doc/developer_guide.md for details. -->
         <skipIntegrationTests>true</skipIntegrationTests>
     </properties>
@@ -47,7 +47,7 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
             <!-- Version 6 requires Java 17 -->
-            <version>5.14.4</version>
+            <version>6.1.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>exasol-jdbc</artifactId>
-            <version>26.2.7</version>
+            <version>26.2.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.exasol</groupId>
             <artifactId>test-db-builder-java</artifactId>
-            <version>4.0.0</version>
+            <version>4.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -97,7 +97,7 @@
             <!-- Required by Apache Hive Metastore container -->
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.11</version>
+            <version>42.7.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -120,7 +120,7 @@
             <plugin>
                 <groupId>com.exasol</groupId>
                 <artifactId>project-keeper-maven-plugin</artifactId>
-                <version>5.6.2</version>
+                <version>5.7.3</version>
                 <executions>
                     <execution>
                         <goals>

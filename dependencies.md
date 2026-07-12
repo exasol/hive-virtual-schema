@@ -65,7 +65,7 @@
 [8]: https://github.com/mockito/mockito
 [9]: https://opensource.org/licenses/MIT
 [10]: https://www.exasol.com/
-[11]: https://repo1.maven.org/maven2/com/exasol/exasol-jdbc/26.2.7/exasol-jdbc-26.2.7-license.txt
+[11]: https://repo1.maven.org/maven2/com/exasol/exasol-jdbc/26.2.8/exasol-jdbc-26.2.8-license.txt
 [12]: https://github.com/exasol/exasol-testcontainers/
 [13]: https://github.com/exasol/exasol-testcontainers/blob/main/LICENSE
 [14]: https://java.testcontainers.org
